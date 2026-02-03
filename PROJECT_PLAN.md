@@ -1,784 +1,707 @@
-# Bader Platform - Project Plan v3.0
+# Bader Platform - Development Roadmap
 
-**Version:** 3.0 (Comprehensive Carpenter OS)  
+**Version:** 4.0 (Development Ready)  
 **Date:** February 3, 2026  
-**Location:** Rif Damascus, Darraya, Syria  
-**Status:** Final Planning - Awaiting Priorization
+**Status:** **ACTIVE DEVELOPMENT** 🚀
 
 ---
 
-## 🎯 EXECUTIVE SUMMARY
-
-**Bader Platform** is evolving from a simple catalog app into a **comprehensive Carpenter Operating System** - a "workshop + office" that carpenters carry in their pocket.
-
-**Core Concept:** "Everything a carpenter needs to run their entire business from one phone"
-
----
-
-## 📋 Table of Contents
-
-1. [Architecture Decisions](#architecture-decisions)
-2. [Complete Feature Set](#complete-feature-set)
-3. [MVP vs. Advanced Features](#mvp-vs-advanced-features)
-4. [Development Strategy](#development-strategy)
-5. [Technical Stack Updates](#technical-stack-updates)
-6. [Wireframe Requirements](#wireframe-requirements)
-
----
-
-## 🏗 Architecture Decisions
-
-### 1. **Database: Supabase** ✅
-- **Choice:** Option A - Full cloud sync
-- **Rationale:** Data backup, multi-device sync, real-time updates
-- **Architecture:**
-  ```
-  Local (IndexedDB) ⇄ Supabase (PostgreSQL)
-  - Offline: Work entirely local
-  - Online: Auto-sync every 5 min
-  - Conflict: Last-write-wins with user notification
-  ```
-
-### 2. **Maps: OpenStreetMap** ✅
-- **Choice:** Option B - Free mapping
-- **Rationale:** No API costs, good coverage in Damascus area
-- **Implementation:**
-  - Show client location on map
-  - Calculate distance for delivery fees
-  - Basic navigation (if network allows)
-
-### 3. **Notifications: Web Push** ✅
-- **Choice:** Option A - Yes, use web push
-- **Rationale:** Critical for reminders (deadlines, sync status, new quotes)
-- **Implementation:**
-  - Service Worker + Push API
-  - Remind: "Job due in 2 hours"
-  - Notify: "New order from client"
-  - Alert: "Quote was viewed"
-
-### 4. **WhatsApp: WhatsApp Business API** ✅
-- **Choice:** Option A - Auto-send via WhatsApp Business API
-- **Rationale:** Reliable, professional, tracks delivery
-- **Implementation:**
-  - Auto-generate quotes as formatted messages
-  - Attach PDF invoices
-  - Track message status (sent/delivered/read)
-  - Use WhatsApp Business number for branding
-
-### 5. **Admin Authentication: Phone + SMS** 📱
-- **Choice:** Phone number with SMS verification
-- **Rationale:** Most Syrians have phone, easier than email
-- **Implementation:**
-  - Input: +963 xxx xxxx xxx
-  - Verify: SMS code sent to phone
-  - Session: Secure token stored locally
-  - Backup: Recovery via SMS
-
----
-
-## 📁 Complete Feature Set (Categorized)
-
-### 🛠️ CORE DAILY TOOLS (15 Features)
-
-#### 1. Measurement Helper
-- [ ] Quick fraction/metric converter
-- [ ] Add/subtract dimensions (e.g., "total wall 3.2m - 0.5m door = 2.7m remaining")
-- [ ] Store room measurements
-- [ ] Tag by project/room (e.g., "Kitchen A – Wall 1")
-- [ ] Sync with job cards
-
-#### 2. Cut List Generator
-- [ ] Input final piece sizes
-- [ ] Auto-calculate board/panel quantities
-- [ ] Generate label codes for each piece (e.g., "A1", "A2", "A3")
-- [ ] Export to WhatsApp/PDF
-
-#### 3. Panel/Board Optimizer
-- [ ] Layout pieces on standard sheets (e.g., 1220×2440)
-- [ ] Lumber length input
-- [ ] Saw-kerf compensation (blade thickness)
-- [ ] Rotation options (rotate for better fit)
-- [ ] Minimize waste calculation
-- [ ] Visual cutting diagram
-- [ ] Output: Optimized cut plan with efficiency %
-
-#### 4. On-Site Checklist
-- [ ] Pre-built checklists:
-  - Installation days: Tools, hardware, steps
-  - Delivery days: Materials checklist, photos
-- [ ] Tick-off each item
-- [ ] Attach photos to checklist items
-- [ ] Per job storage
-
-#### 5. Job Cards
-**Each job contains:**
-- [ ] **Client Info:** Name, phone, address
-- [ ] **Photos:** Before/after, progress shots
-- [ ] **Notes:** Text + voice notes
-- [ ] **Drawings:** Sketch uploads
-- [ ] **Status:** Inquiry → Measuring → Quoting → In Progress → Finished → Paid
-- [ ] **Swipe between jobs** for easy navigation
-
-#### 6. Calendar & Reminders
-- [ ] Schedule site visits, deliveries, installation days
-- [ ] Add crew assignments (if multiple workers)
-- [ ] Notifications for:
-  - "Job due in 2 hours"
-  - "Client site visit today at 10am"
-  - "Materials order arriving tomorrow"
-  - "Payment due in 3 days"
-- [ ] Month/Week/Day views
-
-#### 7. CRM Lite
-- [ ] Client list with contact info
-- [ ] Past jobs history per client
-- [ ] "What you built for me" summary
-- [ ] Materials used per client (for quick re-order)
-- [ ] Quick repeat order button
-
-#### 8. Estimating, Quoting, and Invoicing
-
-**Estimator:**
-- [ ] Templates for common jobs:
-  - Cabinet
-  - Door
-  - Deck
-  - Wardrobe
-- [ ] Combine: Material cost + Labor hours + Delivery + Cutting
-- [ ] Save quotes as drafts
-- [ ] Send via WhatsApp (one tap)
-
-**Invoicing:**
-- [ ] Mark deposits (paid/unpaid, amount, date)
-- [ ] Track final payments
-- [ ] See unpaid jobs dashboard
-- [ ] Send payment reminders
-- [ ] Option: "Integrate with accounting software later"
-
-#### 9. Inventory, Materials, and Suppliers
-
-**Material Library:**
-- [ ] MDF, plywood, solid wood, profiles
-- [ ] Dimensions: Stock lengths/sheet sizes, waste factor
-- [ ] Default waste factor per material type
-- [ ] Price per unit (USD/SYP toggle)
-
-**Stock Tracking:**
-- [ ] How many sheets/boards left
-- [ ] Auto-deduct when job confirmed
-- [ ] Low stock alerts (e.g., "MDF 16mm below 5 sheets")
-- [ ] Material cost updater from cut list
-
-**Supplier List:**
-- [ ] Where they buy each material
-- [ ] Last price purchased
-- [ ] Phone numbers
-- [ ] Typical lead time for orders
-
----
-
-### ✨ EXTRA "WOW" FEATURES (8 Features)
-
-#### 10. Photo-to-Measure Note
-- [ ] Camera capture of room/space
-- [ ] Overlay text boxes on photo
-- [ ] Draw measurement lines + write values
-- [ ] Add specific area notes (e.g., "kitchen counter - tricky corner")
-- [ ] Auto-calculate area/length from markup
-- [ ] Save marked-up photo per job
-- [ ] Share marked photo (WhatsApp, email)
-- [ ] Export as image
-
-#### 11. AI from Sketch to Cut List (V1 - Simple)
-- [ ] Input: Hand-drawn rough room sketch + cabinet dimensions
-- [ ] AI suggests: Proposed cabinet breakdown + door cut list
-- [ ] Output: Structured cut list ready for shop
-- [ ] **Note:** Simple pattern matching first (not full 3D yet)
-
-#### 12. PDF Export for Shop
-- [ ] Generate printable sheet with:
-  - Piece labels (with codes)
-  - Cutting diagram
-  - Material list
-  - Quantity summary
-- [ ] One-tap "Print" or "Share to helpers"
-- [ ] Include BADER branding
-
-#### 13. Simple Project Dashboard
-- [ ] One-screen overview:
-  - Active jobs (3 cards)
-  - Today's tasks
-  - Materials to order (low stock)
-  - Unpaid invoices
-  - Reminders for today
-- [ ] Tap any card to see full details
-
----
-
-### 🏭 SHOP AUTOMATION (9 Features)
-
-#### 14. Production & CNC File Exporter
-- [ ] From cut list/layout, generate:
-  - G-code for CNC routers
-  - DXF for CAD software
-  - Toolpath preview visualization
-- [ ] Machine presets (common router/saw brands)
-- [ ] One-tap export to file
-
-#### 15. Joinery Calculator
-- [ ] Instant calculations for any board thickness:
-  - Mortise & tenon dimensions
-  - Dovetail slots
-  - Pocket hole sizes
-  - Angles (45°, 30°, custom)
-- [ ] Visual diagram of joint
-- [ ] Save custom joints to templates
-
-#### 16. Waste Tracker
-- [ ] Log every job's actual material usage
-- [ ] Predict future scrap rates
-- [ ] Compare: Actual vs. Theoretical waste
-- [ ] Suggest: "Buy shorter sheets to reduce waste"
-- [ ] "Total waste this month" dashboard
-
-#### 17. Team, Collaboration, and Growth
-- [ ] Share jobs with team members
-- [ ] Assign tasks (e.g., "cut pieces A1-A5")
-- [ ] Real-time progress updates (when online)
-- [ ] Team chat per job
-- [ ] Share measurements/photos
-
-#### 18. Client Portal
-- [ ] Share job progress with client via link
-- [ ] Client can view:
-  - Progress photos
-  - Timeline status
-  - Payment status
-- [ ] Client can approve changes online
-- [ ] Client can pay deposits (future - integrate payment gateway)
-- [ ] Feedback/rating after job
-
-#### 19. Crew App
-- [ ] Foreman view: See all assigned tasks
-- [ ] Mark task complete with photo proof
-- [ ] Time tracking per crew member
-- [ ] Crew can see daily schedule
-- [ ] Push notifications to crew
-
----
-
-### 💡 GROWTH TOOLS (15 Features)
-
-#### 20. Profit Analytics
-- [ ] Per job breakdown:
-  - Materials: 40%
-  - Labor: 35%
-  - Delivery: 5%
-  - Tools: 3%
-  - Net profit: 17%
-- [ ] See: "This job had unusually low profit - why?"
-- [ ] Monthly/Yearly profit trends
-- [ ] Most profitable job types
-- [ ] Export for accounting
-
-#### 21. Voice Input
-- [ ] Dictate measurements: "add 2.5m by 1.2m"
-- [ ] Dictate notes: "client wants rounded corners"
-- [ ] Auto-transcribe to text (when online)
-- [ ] Works in 2 languages (Arabic + English)
-
-#### 22. Material Cost Updater
-- [ ] Scan supplier catalogs or import prices
-- [ ] Auto-adjust quotes when prices change
-- [ ] "Price dropped 20% on MDF - update your quotes!"
-- [ ] Compare suppliers side-by-side
-- [ ] Suggest best price per location
-
-#### 23. Template Library
-- [ ] Save winning jobs as templates
-- [ ] "Standard kitchen cabinet" - one-tap reuse
-- [ ] Modify dimensions (e.g., change width, everything else stays)
-- [ ] Share templates with team
-
----
-
-### 🎨 DESIGN & VISUALIZATION (6 Features)
-
-#### 24. 3D Modeler Lite (V1 - Basic)
-- [ ] Drag-drop cabinets/shelves/doors
-- [ ] Apply real wood textures
-- [ ] Generate cut list from model
-- [ ] Render basic preview for client
-- [ ] Export as image or 3D file
-
-#### 25. AR Preview (Future - V2)
-- [ ] Use phone camera to place 3D model in client's room
-- [ ] "Before/after" walkthrough during quoting
-- [ ] Client approves changes in real-time
-- [ ] Requires: Better phone cameras
-
-#### 26. Sketch-to-Plan
-- [ ] Upload hand-drawn idea or room photo
-- [ ] AI suggests:
-  - Dimensions and parts breakdown
-  - Door cut list
-- [ ] Export as structured plan
-
----
-
-### 🧠 AI-POWERED HELPERS (3 Features)
-
-#### 27. AI Chat Assistant
-- [ ] Built-in knowledge base for carpentry
-- [ ] Ask: "How many screws for 10m trim?"
-- [ ] Ask: "Best glue for oak joints?"
-- [ ] Ask: "Standard door height in Syria?"
-- [ ] Instant answers (no waiting for human)
-
-#### 28. Smart Pricing
-- [ ] Analyze:
-  - Local market rates (Damascus, Darraya)
-  - Material costs (real-time from suppliers)
-  - Job complexity factors
-- [ ] Suggest: Optimal quote price dynamically
-- [ ] Show: "This price is competitive" or "You're undercharging"
-
-#### 29. Demand Prediction
-- [ ] Analyze: Most requested job types in your area
-- [ ] Seasonal trends (e.g., "Kitchens peak in Ramadan")
-- [ ] Suggest: "Focus on wardrobes this month"
-- [ ] Help plan: Stock up on materials before peak season
-
----
-
-### 📊 ADVANCED ANALYTICS (5 Features)
-
-#### 30. Waste Hotspots
-- [ ] Identify: Which jobs have highest waste
-- [ ] Root cause: "You always overbuy MDF by 15%"
-- [ ] Suggest: Better material sizes or cutting strategies
-- [ ] Track cumulative waste cost (save $200 this month by optimizing)
-
-#### 31. Busiest Months & Top Profit
-- [ ] See: "Your busiest months are X, Y, Z"
-- [ ] See: "Most profitable jobs are cabinets, doors"
-- [ ] Plan: Hire help during busy months
-- [ ] Plan: Market specific services in slow months
-
-#### 32. Client Insights
-- [ ] "Which clients always pay on time?" - Prioritize them
-- [ ] "Which clients request the most changes?" - Charge for revisions
-- [ ] "Which clients refer you the most?" - Offer discounts
-- [ ] Send: "Happy birthday" or "Thanks for 10 jobs this year"
-
----
-
-### 🛡️ SAFETY & COMPLIANCE (4 Features)
-
-#### 33. Job Site Checklists
-- [ ] OSHA-style pre-work inspections:
-  - [ ] Ladder secured?
-  - [ ] PPE worn?
-  - [ ] Power tools grounded?
-  - [ ] Fire extinguisher accessible?
-  - [ ] First aid kit available?
-- [ ] Photo proof for each item
-- [ ] Auto-generate safety report
-
-#### 34. Incident Logger
-- [ ] Quick-report accidents/near-misses:
-  - What happened
-  - Photos of damage/injury
-  - Root cause
-- [ ] Follow-up actions documented
-- [ ] Trend analysis to prevent repeats
-- [ ] Export for insurance
-
-#### 35. Training Tracker
-- [ ] Log certifications (forklift, first aid, safety courses)
-- [ ] Expiration alerts: "First aid expires in 30 days"
-- [ ] Quiz helpers for refreshers
-- [ ] Track team training status
-
----
-
-### ♻️ SUSTAINABILITY (3 Features)
-
-#### 36. Carbon/Material Tracker
-- [ ] Calculate job's wood waste (m³)
-- [ ] Estimate carbon emissions
-- [ ] Suggest: "Use shorter sheets - 15% less waste"
-- [ ] Generate green certifications for clients
-- [ ] "Sustainability score" per job
-
----
-
-### 🔗 SUPPLIER PORTAL (2 Features)
-
-#### 37. Supplier List & Pricing
-- [ ] List: Where you buy each material
-- [ ] Track: Last price, typical lead time
-- [ ] Compare: Side-by-side supplier prices
-- [ ] Auto-request quotes from multiple suppliers
-
-#### 38. Auto-Request Quotes
-- [ ] From Bader app, send order to 3+ suppliers
-- [ ] Compare responses in one view
-- [ ] Select best price + delivery time
-- [ ] One-tap order placement
-
----
-
-### 📈 MARKETING & EXPANSION (4 Features)
-
-#### 39. Review Collector
-- [ ] After job finish, auto-send: "How was our work?" (1-5 stars)
-- [ ] Showcase 5-star jobs on profile
-- [ ] Use reviews in marketing
-- [ ] Ask for testimonials for photos
-
-#### 40. Lead Finder
-- [ ] If on-demand style: See nearby jobs
-- [ ] Post availability: "Available for custom furniture in Damascus"
-- [ ] Match with client requests
-- [ ] Referral bonus tracking
-
-#### 41. SEO & Portfolio Builder
-- [ ] Auto-generate website pages from finished jobs:
-  - Photos
-  - Specs
-  - Testimonials
-- [ ] Public portfolio URL (e.g., bader.kholani.store/portfolio)
-- [ ] Social sharing for jobs
-
-#### 42. Referral System
-- [ ] "Refer Bader to other carpenters"
-- [ ] Track referrals and conversions
-- [ ] Rewards: Discounts or free utilities for referrals
-- [ ] Leaderboard: Top referrers get bonuses
-
----
-
-## 📦 MVP vs. Advanced Features
-
-### 🎯 MVP (Minimum Viable Product) - Launch in 6-8 Weeks
-
-**Core Daily Tools (15 features):**
-- ✅ Measurement Helper
-- ✅ Cut List Generator
-- ✅ Panel/Board Optimizer
-- ✅ On-Site Checklist
-- ✅ Job Cards
-- ✅ Calendar & Reminders (basic)
-- ✅ CRM Lite
-- ✅ Estimating/Quoting (basic templates)
-- ✅ Invoicing (deposits tracking)
-- ✅ Inventory (basic stock levels)
-- ✅ Supplier List
-- ✅ Photo-to-Measure
-- ✅ Simple Dashboard
-- ✅ Project Dashboard
-
-**Essential Wow Features (3 features):**
-- ✅ PDF Export for Shop
-- ✅ Voice Input
-- ✅ Template Library
-
-**Basic Shop Automation (2 features):**
-- ✅ Waste Tracker
-- ✅ Team Collaboration (basic job sharing)
-
-**Total MVP: 20 core features**
-
----
-
-### 🚀 Advanced Features - Post-Launch (Months 3-12)
-
-**Advanced Shop Automation:**
-- ⬜ Production & CNC File Exporter
-- ⬜ Joinery Calculator
-- ⬜ Crew App
-- ⬜ Client Portal
-- ⬜ Team Chat
-- ⬜ Real-time Progress
-- ⬜ Push Notifications to Crew
-
-**Design & Visualization:**
-- ⬜ 3D Modeler Lite
-- ⬜ AR Preview (V2)
-- ⬜ Sketch-to-Plan
-
-**AI-Powered:**
-- ⬜ AI Chat Assistant
-- ⬜ Smart Pricing
-- ⬜ Demand Prediction
-
-**Advanced Analytics:**
-- ⬜ Waste Hotspots
-- ⬜ Busiest Months & Top Profit
-- ⬜ Client Insights
-
-**Safety & Compliance:**
-- ⬜ Job Site Checklists
-- ⬜ Incident Logger
-- ⬜ Training Tracker
-
-**Sustainability:**
-- ⬜ Carbon/Material Tracker
-
-**Supplier Portal:**
-- ⬜ Auto-Request Quotes
-- ⬜ Supplier Comparison
-
-**Marketing & Expansion:**
-- ⬜ Review Collector
-- ⬜ Lead Finder
-- ⬜ SEO & Portfolio Builder
-- ⬜ Referral System
-
-**Total Advanced: 25 features**
-
----
-
-## 🎯 Development Strategy
-
-### Phase 0: Technical Setup (Week 1)
-- [ ] Configure Supabase project
-- [ ] Set up database schema
-- [ ] Implement IndexedDB for offline
-- [ ] Configure Service Worker
-- [ ] Set up OpenStreetMap integration
-- [ ] Configure WhatsApp Business API
-- [ ] Set up SMS verification
-- [ ] Configure Web Push notifications
-
-### Phase 1: MVP Core - Daily Tools (Weeks 2-5)
-- [ ] **Measurement Helper** - All features
-- [ ] **Cut List Generator** - All features
-- [ ] **Panel Optimizer** - Basic algorithm
-- [ ] **On-Site Checklist** - All features
-- [ ] **Job Cards** - All features
-- [ ] **Calendar** - Basic + reminders
-- [ ] **CRM Lite** - All features
-- [ ] **Estimator** - Basic templates
-- [ ] **Invoicing** - Basic tracking
-- [ ] **Inventory** - Basic stock levels
-- [ ] **Supplier List** - Basic
-- [ ] **Photo Notes** - Basic
-- [ ] **Dashboard** - Simple view
-- [ ] **PDF Export** - Basic version
-
-### Phase 2: Wow Features (Weeks 6-7)
-- [ ] **Voice Input** - Speech-to-text
-- [ ] **Template Library** - Save/reuse jobs
-- [ ] **Waste Tracker** - Basic logging
-- [ ] **Team Sharing** - Basic job sharing
-- [ ] **Push Notifications** - Integration
-- [ ] **WhatsApp API** - Integration
-
-### Phase 3: Polish & Launch (Weeks 8)
-- [ ] Beginner-friendly UI audit
-- [ ] Mobile testing on various devices
-- [ ] Offline flow testing
-- [ ] Performance optimization
-- [ ] Accessibility testing
-- [ ] Beta with 5-10 carpenters
-- [ ] Bug fixes
-- [ ] **LAUNCH** 🚀
-
-### Phase 4: Post-Launch - Advanced (Months 3-12)
-- [ ] **Shop Automation** - CNC, Joinery, Crew App
-- [ ] **3D Modeler** - Basic drag-drop
-- [ ] **AI Assistant** - Basic Q&A
-- [ ] **Analytics** - Waste, Profit, Clients
-- [ ] **Safety** - Checklists, Incidents
-- [ ] **Supplier Portal** - Auto-request
-- [ ] **Marketing** - Reviews, Portfolio, SEO
-- [ ] **Client Portal** - Basic sharing
-- [ ] **Advanced Features** - As prioritized
-
----
-
-## 🔧 Technical Stack Updates
-
-### Backend
-- **Database:** Supabase (PostgreSQL)
-- **ORM:** Prisma
-- **API:** Next.js API Routes
-- **Real-time:** Supabase Realtime
-- **Storage:** Supabase Storage (images, PDFs)
-
-### Frontend
-- **Framework:** Next.js 16.1.6
-- **UI:** shadcn/ui
-- **Styling:** Tailwind CSS 4.1.18
-- **State Management:** Zustand (simple, offline-friendly)
-- **Forms:** React Hook Form + Zod validation
-- **Charts:** Recharts (for analytics)
-
-### Integrations
-- **Maps:** Leaflet + OpenStreetMap
-- **Push:** OneSignal (or native Web Push)
-- **SMS:** Twilio (for auth)
-- **WhatsApp:** WhatsApp Business API
-- **AI (Future):** OpenAI API (for advanced features)
-- **Voice:** Web Speech API (built-in, free)
-
-### Offline-First Architecture
-```
-┌─────────────────────────────────────┐
-│          Supabase (Cloud)          │
-│  - Master database                   │
-│  - Real-time sync                   │
-│  - Backup & collaboration            │
-└─────────────────────────────────────┘
-           ↕ Sync (bidirectional)
-┌─────────────────────────────────────┐
-│          IndexedDB (Local)           │
-│  - Offline work                      │
-│  - Fast local queries               │
-│  - Service Worker caching            │
-└─────────────────────────────────────┘
-```
-
----
-
-## 📐 Wireframe Requirements
-
-**I need your direction:** Should I create wireframes now, or after you prioritize features?
-
-**Wireframes will include:**
-1. **Core User Flows:**
-   - Home/Dashboard screen
-   - Product browsing
-   - Measurement tool
-   - Job card view
-   - Cut list generator
-   - Estimator
-   - Settings
-
-2. **Admin Flows:**
-   - Product management
-   - Inventory dashboard
-   - Order management
-   - Analytics dashboard
-
-3. **Team/Collab Flows:**
-   - Job sharing
-   - Crew assignments
-   - Team chat
-
-**Please confirm:**
-- [ ] Create wireframes now (before development)
-- [ ] Start development directly (build as we go)
-- [ ] Create wireframes for specific flows only (which ones?)
-
----
-
-## 🎯 Critical Decision: Prioritization
-
-**We now have 58 total features.** We need to decide what goes into MVP (launch) vs. post-launch.
-
-### My Recommendation (Based on "Rush Mode"):
-
-**MVP Priority 1 - Core Daily Tools (Launch)**
-1. Measurement Helper
-2. Cut List Generator
-3. Panel Optimizer
-4. On-Site Checklist
-5. Job Cards
-6. Calendar
-7. CRM Lite
-8. Estimator
-9. Invoicing
-10. Inventory
-11. Supplier List
-12. Photo Notes
-13. Simple Dashboard
-14. PDF Export
-15. Voice Input
-16. Template Library
-17. Waste Tracker
-18. Team Sharing
-19. Push Notifications
-20. WhatsApp API
-
-**Post-Launch (After 2 months):**
-- 3D Modeler
-- AI Assistant
-- CNC File Exporter
+## 🎯 FINAL DECISIONS LOCKED
+
+### 1. MVP Scope: [B] - 27 Core Features (6-8 weeks)
+**Launch Target:** 27 essential features that will make Bader indispensable to workshop-based furniture carpenters
+
+**Core Features Included:**
+- 15 Core Daily Tools (measurement, cut lists, optimization, etc.)
+- 8 "Wow" Features (PDF export, voice input, templates, waste tracking)
+- 2 Basic Shop Automation (waste tracker, team sharing)
+- 2 Basic Wow Features (simple dashboard, push notifications)
+
+**Deferred to Post-Launch (Months 3-12):**
+- 9 Shop Automation (CNC export, joinery calculator, crew app, client portal)
+- 15 Growth Tools (profit analytics, voice input, AI assistant, smart pricing)
+- 6 Design & Visualization (3D modeler, AR preview, sketch-to-plan)
+- 3 AI-Powered (AI chat, smart pricing, demand prediction)
+- 5 Advanced Analytics (waste hotspots, busiest months, client insights)
+- 4 Safety & Compliance (checklists, incident logger, training tracker)
+- 3 Sustainability (carbon tracker, green certifications)
+- 2 Supplier Portal (auto-request, supplier comparison)
+- 4 Marketing & Expansion (reviews, lead finder, SEO, referral)
+
+### 2. Wireframes: [B] - Build As We Go
+**Strategy:** Start development immediately, create wireframes for specific screens when needed during development
+
+**Approach:**
+- Build core features first (layout, navigation, database)
+- Create wireframes only for complex flows before implementation
+- Keep documentation updated as features are built
+
+### 3. Target Market: [B] - Workshop-Based Furniture Carpenters
+**Primary Audience:** Furniture makers who need 3D models and CNC exports
+
+**Priority Features for This Market:**
+- Production & CNC File Exporter (V1 priority)
+- 3D Modeler Lite (V1 priority)
 - Joinery Calculator
-- Client Portal
-- Advanced Analytics
-- Safety & Compliance
-- Supplier Portal
-- Marketing & SEO
+- Shop Automation focus (crew management, production workflow)
+
+**Secondary:** On-site construction/trim carpenters will be served by core daily tools
+
+### 4. Monetization: [A] - Free Forever
+**Revenue Model:**
+- Bader pays: Server costs, WhatsApp Business API, SMS, maintenance
+- Bader earns: Revenue from wood sales (app is marketing/sales tool)
+- **No subscription fees** - Always free for carpenters
+
+**Why This Model:**
+- App is a marketing & sales tool for Bader's business
+- More carpenters using app = more wood sales = higher revenue
+- Free forever removes barrier to adoption
+
+### 5. Development Speed: [A] - Aggressive (6-8 weeks MVP)
+**Timeline:**
+- Week 1-8: MVP development (parallel tracks)
+- Launch at Week 8
+- Post-launch: Advanced features based on feedback
+
+**Strategy:**
+- Multiple developers working in parallel (if possible)
+- Prioritized feature delivery
+- Continuous testing and feedback
+- Launch with core features, iterate post-launch
 
 ---
 
-## 🚨 Your Decision Needed
+## 📅 Development Timeline
 
-### Please answer these 5 questions:
+### Week 1: Foundation & Core Setup
+**Track A: Infrastructure**
+- [ ] Supabase project setup
+- [ ] Database schema creation (all MVP tables)
+- [ ] Next.js project structure finalization
+- [ ] Service worker setup (offline support)
+- [ ] IndexedDB integration
+- [ ] OpenStreetMap integration
+- [ ] WhatsApp Business API setup
+- [ ] SMS verification (Twilio)
 
-#### 1. **MVP vs. Post-Launch**
-**Do you agree with my recommended 20-feature MVP?**
-- [ ] Yes, launch with these 20 features first
-- [ ] No, add more to MVP (which ones?)
-- [ ] Launch with ALL 58 features (will take 6+ months)
+**Track B: UI Foundation**
+- [ ] Layout components (navigation, tabs, mobile-first)
+- [ ] RTL + Arabic configuration
+- [ ] Theme setup (minimalist, beginner-friendly)
+- [ ] Authentication screens (login with SMS)
+- [ ] Onboarding screens (first-time user)
 
-#### 2. **Wireframes**
-- [ ] Create full wireframes now (1-2 days)
-- [ ] Start development, create wireframes as needed
-- [ ] Wireframes for specific flows only (which ones?)
+### Week 2: Core Daily Tools (Part 1)
+**Track A: Measurement & Calculations**
+- [ ] Measurement Helper (fraction/metric converter)
+- [ ] Project Checklist (door, window, cabinet templates)
+- [ ] Photo Measurement Markup (draw on photos)
+- [ ] Reference Guide (standard sizes, formulas)
 
-#### 3. **Target Market for MVP**
-- [ ] Workshop-based furniture carpenters (needs 3D, CNC)
-- [ ] On-site construction/trim carpenters (needs measurement, cuts)
-- [ ] Both (build for all types)
-- [ ] Start with one, expand to other later (which one first?)
+**Track B: Data Entry**
+- [ ] Material Library (MDF, wood, glue, accessories)
+- [ ] Supplier List (prices, contacts, lead times)
+- [ ] Stock Tracking (basic levels)
+- [ ] Exchange Rate Manager (API + manual, new SYP rule)
 
-#### 4. **Monetization (Future)**
-Should Bader Platform have:
-- [ ] Free forever (operating cost only)
-- [ ] Freemium (free basic, paid advanced features)
-- [ ] Subscription ($X/month for carpenters)
-- [ ] Not deciding yet
+### Week 3: Core Daily Tools (Part 2)
+**Track A: Cut Lists & Optimization**
+- [ ] Cut List Generator (from final piece sizes)
+- [ ] Panel/Board Optimizer (visual cutting diagram)
+- [ ] Lumber length input
+- [ ] Saw-kerf compensation
+- [ ] Waste minimization algorithm
+- [ ] Label codes generation (A1, A2, A3...)
 
-#### 5. **Development Speed**
-- [ ] Aggressive - Launch in 6-8 weeks (recommended)
-- [ ] Moderate - Launch in 10-12 weeks
-- [ ] Fast but thorough - Launch in 8-10 weeks with high quality
+**Track B: Job Management**
+- [ ] Job Cards (client info, photos, notes, status)
+- [ ] Status workflow (Inquiry → Measuring → Quoting → In Progress → Finished → Paid)
+- [ ] Swipe between jobs
+- [ ] Photo attachments (before/after/progress)
+
+### Week 4: Core Daily Tools (Part 3) + Order System
+**Track A: Project Management**
+- [ ] Project Dashboard (active jobs, today's tasks)
+- [ ] Calendar & Reminders (schedule visits, deliveries)
+- [ ] Push Notifications (job due, material arrival)
+- [ ] Crew Assignments (basic team sharing)
+
+**Track B: Order System**
+- [ ] Order List (browse all orders)
+- [ ] WhatsApp order generation (auto-formatted message)
+- [ ] Admin Order Management (approve, update status)
+- [ ] Order Status Tracking
+- [ ] Delivery Fee Calculator (distance-based)
+
+### Week 5: Core Daily Tools (Part 4) + Wow Features
+**Track A: CRM & Estimating**
+- [ ] CRM Lite (client list, past jobs, materials used)
+- [ ] Estimator (material + labor + delivery + cutting)
+- [ ] Quote Templates (common jobs: cabinet, door, deck)
+- [ ] Quick Quote from Cut List
+- [ ] Professional Quote Generator (BADER branding, PDF export)
+
+**Track B: Advanced Features**
+- [ ] Voice Notes Recording (speech-to-text)
+- [ ] Template Library (save/reuse winning jobs)
+- [ ] Waste Cost Calculator (show money going to trash)
+- [ ] PDF Export for Shop (piece labels, cutting diagrams)
+
+### Week 6: Shop Automation (Priority for Workshop Market)
+**Track A: Production Features**
+- [ ] Production & CNC File Exporter (G-code, DXF)
+- [ ] Machine Presets (common router/saw brands)
+- [ ] Toolpath Preview Visualization
+- [ ] Joinery Calculator (mortise-tenon, dovetail, pockets)
+
+**Track B: Shop Management**
+- [ ] Team Chat (per job)
+- [ ] Real-time Progress Updates
+- [ ] Task Assignments (cut pieces A1-A5)
+- [ ] Time Tracking per Crew Member
+- [ ] Photo Finish for Sign-off
+
+### Week 7: 3D Modeler Lite + Testing
+**Track A: 3D Features**
+- [ ] 3D Modeler Lite (drag-drop cabinets/shelves/doors)
+- [ ] Real Wood Textures
+- [ ] Generate Cut List from Model
+- [ ] Basic Render for Client Preview
+- [ ] Export as Image (send via WhatsApp)
+
+**Track B: Testing**
+- [ ] Complete flow testing (all 20 MVP features)
+- [ ] Offline flow testing (48-hour mode)
+- [ ] Network switching testing
+- [ ] RTL testing (Arabic text direction)
+- [ ] First-time user testing (non-technical carpenters)
+- [ ] Performance optimization
+
+### Week 8: Polish & Launch
+**Track A: UX Refinement**
+- [ ] Beginner-friendly audit (no hidden actions, obvious UI)
+- [ ] Error prevention (validations, confirmations, undo)
+- [ ] Mobile responsiveness (test on various phones)
+- [ ] Accessibility (WCAG AA compliance)
+- [ ] Bug fixes
+
+**Track B: Launch**
+- [ ] Beta testing with 5-10 workshop carpenters
+- [ ] Final performance optimization
+- [ ] Deploy to Dokploy
+- [ ] **🚀 LAUNCH** 
+- [ ] Monitor crash rates & user feedback
+- [ ] Hotfix priority
 
 ---
 
-## 📊 Feature Summary
+## 🏗 Technical Architecture Implementation
 
-| Category | Total Features | In MVP | Post-Launch |
-|----------|---------------|---------|-------------|
-| Core Daily Tools | 15 | 15 | 0 |
-| Wow Features | 8 | 5 | 3 |
-| Shop Automation | 9 | 2 | 7 |
-| Growth Tools | 15 | 5 | 10 |
-| Design & Visualization | 6 | 0 | 6 |
-| AI-Powered | 3 | 0 | 3 |
-| Advanced Analytics | 5 | 0 | 5 |
-| Safety & Compliance | 4 | 0 | 4 |
-| Sustainability | 3 | 0 | 3 |
-| Supplier Portal | 2 | 0 | 2 |
-| Marketing & Expansion | 4 | 0 | 4 |
-| **TOTAL** | **74** | **27** | **47** |
+### Database Schema (MVP)
+
+```sql
+-- Core Tables
+CREATE TABLE users (
+  id UUID PRIMARY KEY,
+  phone_number VARCHAR(15) UNIQUE NOT NULL,
+  sms_verified BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE products (
+  id UUID PRIMARY KEY,
+  name_ar VARCHAR(255) NOT NULL,
+  name_en VARCHAR(255),
+  category VARCHAR(50) NOT NULL,
+  product_type VARCHAR(50),
+  price_usd DECIMAL(10, 2) NOT NULL,
+  specifications JSONB,
+  images TEXT[],
+  stock DECIMAL(10, 2),
+  supplier_name VARCHAR(255),
+  brand VARCHAR(255),
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE jobs (
+  id UUID PRIMARY KEY,
+  user_id UUID REFERENCES users(id),
+  client_name VARCHAR(255) NOT NULL,
+  client_phone VARCHAR(15) NOT NULL,
+  client_address TEXT,
+  status VARCHAR(50) DEFAULT 'inquiry',
+  photos TEXT[],
+  notes TEXT,
+  voice_notes TEXT[],
+  measurements JSONB,
+  estimated_cost DECIMAL(10, 2),
+  actual_cost DECIMAL(10, 2),
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE job_items (
+  id UUID PRIMARY KEY,
+  job_id UUID REFERENCES jobs(id) ON DELETE CASCADE,
+  product_id UUID REFERENCES products(id),
+  quantity DECIMAL(10, 2),
+  price_usd DECIMAL(10, 2),
+  cutting_service JSONB
+);
+
+CREATE TABLE suppliers (
+  id UUID PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  phone VARCHAR(15),
+  last_purchase_price DECIMAL(10, 2),
+  lead_time_days INTEGER,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE exchange_rates (
+  id UUID PRIMARY KEY,
+  usd_to_old_syp DECIMAL(15, 2),
+  usd_to_new_syp DECIMAL(15, 2),
+  conversion_ratio DECIMAL(10, 4) DEFAULT 0.01,
+  timestamp TIMESTAMP DEFAULT NOW(),
+  source VARCHAR(20) DEFAULT 'api',
+  is_official_rate BOOLEAN DEFAULT FALSE
+);
+
+CREATE TABLE measurements (
+  id UUID PRIMARY KEY,
+  user_id UUID REFERENCES users(id),
+  job_id UUID REFERENCES jobs(id),
+  project_name VARCHAR(255),
+  project_type VARCHAR(50),
+  room_name VARCHAR(255),
+  measurements JSONB,
+  notes TEXT,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE cut_lists (
+  id UUID PRIMARY KEY,
+  user_id UUID REFERENCES users(id),
+  job_id UUID REFERENCES jobs(id),
+  items JSONB NOT NULL,
+  generated_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE templates (
+  id UUID PRIMARY KEY,
+  user_id UUID REFERENCES users(id),
+  name VARCHAR(255) NOT NULL,
+  type VARCHAR(50),
+  template_data JSONB NOT NULL,
+  is_public BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE checklists (
+  id UUID PRIMARY KEY,
+  user_id UUID REFERENCES users(id),
+  job_id UUID REFERENCES jobs(id),
+  checklist_data JSONB NOT NULL,
+  completed_at TIMESTAMP
+);
+
+CREATE TABLE invoices (
+  id UUID PRIMARY KEY,
+  job_id UUID REFERENCES jobs(id),
+  total_usd DECIMAL(10, 2) NOT NULL,
+  deposit_usd DECIMAL(10, 2) DEFAULT 0,
+  final_payment_usd DECIMAL(10, 2) DEFAULT 0,
+  status VARCHAR(50) DEFAULT 'pending',
+  sent_via VARCHAR(20),
+  sent_at TIMESTAMP,
+  paid_at TIMESTAMP
+);
+
+-- Indexes for performance
+CREATE INDEX idx_products_category ON products(category);
+CREATE INDEX idx_jobs_status ON jobs(status);
+CREATE INDEX idx_jobs_user ON jobs(user_id);
+CREATE INDEX idx_cut_lists_user ON cut_lists(user_id);
+CREATE INDEX idx_exchange_rates_timestamp ON exchange_rates(timestamp DESC);
+```
+
+### API Routes Structure
+
+```
+/api/auth
+  POST /login - SMS verification
+  POST /verify - Code verification
+
+/api/products
+  GET /list - All products with filters
+  GET /:id - Single product details
+  POST /create - Admin only
+  PUT /:id - Admin only
+  DELETE /:id - Admin only
+
+/api/jobs
+  GET /list - User's jobs
+  GET /:id - Job details
+  POST /create - New job
+  PUT /:id - Update job
+  POST /:id/items - Add item to job
+  POST /:id/status - Change status
+  POST /:id/photos - Upload photos
+  POST /:id/voice-note - Upload voice note
+
+/api/cut-lists
+  POST /generate - Generate from measurements
+  GET /list - User's cut lists
+  GET /:id - Specific cut list
+  POST /:id/optimize - Run optimizer
+
+/api/measurements
+  POST /create - New measurement
+  GET /list - User's measurements
+  GET /:id - Specific measurement
+  PUT /:id - Update measurement
+
+/api/templates
+  GET /list - User's templates
+  GET /public - Public templates
+  POST /create - New template
+  POST /:id/clone - Clone template
+
+/api/checklists
+  GET /job/:id - Checklist for job
+  POST /job/:id/complete - Mark item complete
+
+/api/invoices
+  POST /generate - Generate from job
+  GET /list - User's invoices
+  POST /:id/deposit - Record deposit
+  POST /:id/final-payment - Record final payment
+  GET /:id/pdf - Download PDF
+
+/api/suppliers
+  GET /list - All suppliers
+  POST /create - Add supplier
+  PUT /:id - Update supplier
+
+/api/exchange
+  GET /latest - Latest rate
+  POST /manual-set - Admin manual override
+  POST /sync-api - Sync with API
+
+/api/whatsapp
+  POST /send-order - Send order message
+  POST /send-quote - Send quote
+  POST /send-invoice - Send invoice
+
+/api/sync
+  POST /push - Push local changes to Supabase
+  GET /pull - Fetch updates from Supabase
+  GET /status - Sync status
+```
 
 ---
 
-## 🎉 Status: READY FOR DECISION
+## 🎨 UI/UX Implementation
 
-**Plan Version:** 3.0  
-**Total Features:** 74 comprehensive features  
-**MVP Candidate:** 27 core features (6-8 week timeline)  
-**Post-Launch:** 47 advanced features (months 3-12)
+### Screen Hierarchy
 
-**Next:** Awaiting your 5 decisions → Start development or create wireframes
+```
+Bader App
+├── Onboarding
+│   ├── Welcome Screen (What do you do?)
+│   ├── Language Selection (Arabic/English)
+│   └── Tutorial (3 screens, swipe to learn)
+│
+├── Main Navigation (Bottom Tab Bar)
+│   ├── Home (🏠 Catalog)
+│   ├── Tools (🛠️ Utilities)
+│   ├── Jobs (💼 My Jobs)
+│   ├── Calendar (📅 Schedule)
+│   └── Profile (⚙️ Settings)
+│
+├── Screens
+│   ├── Product Listing
+│   ├── Product Detail
+│   ├── Search & Filters
+│   ├── Measurement Helper
+│   ├── Cut List Generator
+│   ├── Panel Optimizer
+│   ├── Job Card View
+│   ├── Job Detail View
+│   ├── Estimator
+│   ├── Invoice Generator
+│   ├── 3D Modeler
+│   ├── CNC Exporter
+│   └── Settings
+│
+└── Admin Panel (Web Dashboard)
+    ├── Product Management
+    ├── Order Management
+    ├── Exchange Rate Manager
+    ├── Analytics Dashboard
+    └── User Management
+```
+
+### Color System
+
+```css
+/* Primary Colors */
+--primary-wood: #8B7355; /* Warm wood tone */
+--primary-accent: #4CAF50; /* Green for success */
+--primary-orange: #FF9800; /* Orange for industry */
+
+/* Semantic Colors */
+--success: #4CAF50;
+--warning: #FFC107;
+--error: #F44336;
+--info: #2196F3;
+
+/* Backgrounds */
+--bg-primary: #FFFFFF;
+--bg-secondary: #F5F5F5;
+--bg-accent: #FFF3E0;
+
+/* Text */
+--text-primary: #212121;
+--text-secondary: #757575;
+--text-muted: #9E9E9E;
+```
+
+### Component Design System
+
+```typescript
+// Button Variants
+<Button variant="primary"> {/* GREEN BIG BUTTON */}
+<Button variant="secondary"> {/* GRAY MEDIUM */}
+<Button variant="danger"> {/* RED CANCEL */}
+// ALL BUTTONS HAVE TEXT LABELS
+
+// Typography
+<Text size="xl" weight="bold"> {/* BIG NUMBERS */}
+<Text size="md"> {/* BODY TEXT */}
+<Text size="sm" muted> {/* SECONDARY */}
+
+// Currency Display
+<Currency amount={12.50} currency="USD" />
+// Shows: $12.50 USD | 12,500 New SYP
+
+// Empty States
+<EmptyState 
+  icon={icon} 
+  message="Tap here to add product"
+  action="Add Product"
+/>
+
+// Loading States
+<Spinner />
+<Skeleton />
+```
 
 ---
 
-**End of Comprehensive Planning Phase** 🚀
+## 🚀 Launch Readiness Checklist
+
+### Week 8: Go/No-Go Decisions
+
+**Technical:**
+- [ ] All 27 MVP features implemented
+- [ ] All API endpoints tested
+- [ ] Offline mode working (48-hour test passed)
+- [ ] Service Worker caching functional
+- [ ] IndexedDB sync working
+- [ ] WhatsApp Business API integrated
+- [ ] SMS verification working
+- [ ] Exchange rate API + manual working
+
+**Performance:**
+- [ ] App loads in < 3 seconds (offline)
+- [ ] First-time user completes first calculation in < 1 minute
+- [ ] All features accessible within 3 taps
+- [ ] Page load time < 1 second
+- [ ] No lag in cut list optimization
+
+**UX:**
+- [ ] All screens pass beginner-friendliness audit
+- [ ] No hidden actions found
+- [ ] All defaults removed (everything explicit)
+- [ ] RTL working perfectly for Arabic
+- [ ] Currency toggle working (USD/SYP/Old SYP)
+- [ ] New SYP conversion (10,000 = 100) working
+
+**Testing:**
+- [ ] Tested on Android 6+ (minimum target)
+- [ ] Tested on Android 10+
+- [ ] Tested on iPhone iOS 15+
+- [ ] Tested on iPad
+- [ ] Tested on poor network (3G)
+- [ ] Tested offline for 48 hours
+- [ ] Tested with 5 beta carpenters
+
+**Documentation:**
+- [ ] User guide written (Arabic)
+- [ ] Admin guide written (Arabic)
+- [ ] API documentation updated
+- [ ] Video tutorials recorded (optional)
+
+**Legal:**
+- [ ] Privacy policy created
+- [ ] Terms of service created
+- [ ] WhatsApp Business API terms reviewed
+
+**Deployment:**
+- [ ] Supabase production project ready
+- [ ] Dokploy deployment configured
+- [ ] Domain DNS configured
+- [ ] SSL certificate valid
+- [ ] Backup system tested
+- [ ] Monitoring tools set up
+
+**Marketing:**
+- [ ] Launch announcement prepared (Arabic)
+- [ ] WhatsApp groups notified
+- [ ] Facebook posts scheduled
+- [ ] Demo video recorded (5-minute walkthrough)
+
+---
+
+## 📊 Post-Launch Plan (Months 3-12)
+
+### Month 1-2: Advanced Shop Automation
+- [ ] Crew App (full task management)
+- [ ] Client Portal (job progress sharing)
+- [ ] Advanced Team Chat
+- [ ] Real-time Collaboration
+- [ ] Push Notifications to Crew
+
+### Month 3-4: 3D Modeler V2 + AR Preview
+- [ ] Advanced 3D models (textures, lighting)
+- [ ] AR Preview (place model in client's room)
+- [ ] Before/After comparison
+- [ ] Material suggestions from 3D model
+- [ ] Export to OBJ/FBX formats
+
+### Month 5-6: AI Assistant
+- [ ] AI Chat Assistant (integrated knowledge base)
+- [ ] Smart Pricing (analyze market + costs + complexity)
+- [ ] Demand Prediction (seasonal trends, area preferences)
+- [ ] Automatic Quote Optimization
+- [ ] Project Suggestion from Photo (AI sketch recognition)
+
+### Month 7-8: Advanced Analytics + Growth Tools
+- [ ] Profit Analytics (detailed breakdown per job type)
+- [ ] Waste Hotspot Analysis (identify problem areas)
+- [ ] Busiest Months Dashboard
+- [ ] Top Profitable Products
+- [ ] Client Insights (payment patterns, referrals)
+- [ ] Team Performance Tracker
+
+### Month 9-10: Safety + Sustainability
+- [ ] Job Site Checklists (OSHA-style)
+- [ ] Incident Logger (photos, follow-up, trends)
+- [ ] Training Tracker (certifications, expirations)
+- [ ] Carbon/Material Tracker (waste emissions)
+- [ ] Green Certifications Generator
+- [ ] Sustainability Score per Job
+
+### Month 11-12: Expansion Features
+- [ ] Supplier Portal (auto-request, compare prices)
+- [ ] Auto-Request Quotes (to 3+ suppliers)
+- [ ] Review Collector (5-star system)
+- [ ] Lead Finder (on-demand jobs nearby)
+- [ ] SEO & Portfolio Builder (auto-pages from jobs)
+- [ ] Referral System (bonuses, leaderboard)
+
+---
+
+## 🎯 Success Metrics
+
+### Launch Targets (Week 8)
+- [ ] 50+ carpenters using app actively by end of Week 1
+- [ ] 100+ jobs created by end of Week 2
+- [ ] 500+ cut lists generated by end of Week 4
+- [ ] 10,000+ product views by end of Week 4
+- [ ] < 5% crash rate
+- [ ] 4.5+ star rating (Play Store/Website)
+- [ ] Zero critical bugs (crashes, data loss)
+
+### 3-Month Targets
+- [ ] 500+ active carpenters
+- [ ] 2,000+ jobs created
+- [ ] 10,000+ cut lists generated
+- [ ] 500+ templates saved
+- [ ] 1,000+ PDF quotes generated
+- [ ] 20% repeat usage (users open app 5+ times/week)
+
+### 6-Month Targets
+- [ ] 1,000+ active carpenters
+- [ ] 10,000+ jobs created
+- [ ] 50,000+ cut lists generated
+- [ ] 200+ public templates
+- [ ] 5,000+ PDF quotes generated
+- [ ] 30% repeat usage
+
+---
+
+## 🔐 Security Checklist
+
+### Authentication & Authorization
+- [ ] Phone number validation (E.164 format)
+- [ ] SMS verification with 6-digit code
+- [ ] Rate limiting (5 attempts/minute)
+- [ ] Session tokens expire after 30 days
+- [ ] Admin-only endpoints protected
+
+### Data Protection
+- [ ] All API inputs validated (Zod schemas)
+- [ ] SQL injection prevention (Prisma ORM)
+- [ ] XSS prevention (React sanitization)
+- [ ] CSRF protection on all state-changing requests
+- [ ] File upload validation (type, size, content)
+- [ ] Sensitive data encrypted at rest (Supabase)
+
+### API Security
+- [ ] Rate limiting (100 requests/minute per user)
+- [ ] CORS restricted to bader.kholani.store
+- [ ] Webhook signature verification (WhatsApp callbacks)
+- [ ] Request logging (audit trail)
+- [ ] IP-based blocking (after 20 failed attempts)
+
+### Privacy
+- [ ] GDPR-compliant privacy policy
+- [ ] Data export request handler
+- [ ] Data deletion request handler
+- [ ] Cookie consent banner
+- [ ] Minimal data collection (only what's needed)
+
+---
+
+## 🚀 READY TO START DEVELOPMENT
+
+**Status:** All decisions locked, roadmap finalized  
+**Timeline:** 8 weeks to launch  
+**Team:** Ready for aggressive parallel development  
+**Next:** Begin Week 1 - Foundation & Core Setup
+
+**Repository:** https://github.com/shamskholani2020/fullstack-app
+
+---
+
+## 📝 Development Log
+
+**Week 1:**
+- Started: TBD
+- Completed: TBD
+- Notes: TBD
+
+**Week 2:**
+- Completed: TBD
+- Notes: TBD
+
+...
+
+---
+
+**End of Development Roadmap - Let's Build BADER!** 🛠️🚀
