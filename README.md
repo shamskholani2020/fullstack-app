@@ -56,9 +56,33 @@ npx shadcn@latest add [component-name]
 
 Available components: https://ui.shadcn.com/
 
+## 🐳 Docker Deployment
+
+### Build and Run Locally
+
+```bash
+# Build the Docker image
+docker build -t fullstack-app .
+
+# Run the container
+docker run -p 3000:3000 fullstack-app
+```
+
+### Deploy to Dokploy
+
+1. Push to GitHub repository
+2. In Dokploy UI:
+   - Connect GitHub account
+   - Select `shamskholani2020/fullstack-app`
+   - Configure deployment settings
+   - Deploy
+
+**Repository URL**: https://github.com/shamskholani2020/fullstack-app
+
 ## 📝 Notes
 
 - Using Tailwind CSS v4 with PostCSS
 - App Router enabled (`src` directory)
 - TypeScript strict mode enabled
 - ESLint configured with Next.js rules
+- Docker multi-stage build optimized for production
