@@ -19,8 +19,9 @@ export default function Navigation() {
   const navItems: NavItem[] = [
     { href: "/", label: "الرئيسية", icon: Home },
     { href: "/measurement", label: "القياس", icon: Calculator },
-    { href: "/projects", label: "المشاريع", icon: ClipboardList, badge: 3 },
-    { href: "/suppliers", label: "المواد", icon: Package },
+    { href: "/checklist", label: "القوائم", icon: CheckSquare },
+    { href: "/jobs", label: "المشاريع", icon: ClipboardList, badge: 3 },
+    { href: "/products", label: "المواد", icon: Package },
     { href: "/messages", label: "الرسائل", icon: MessageCircle, badge: 7 },
     { href: "/settings", label: "الإعدادات", icon: Settings },
   ];
