@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calculator, ClipboardList, LayoutGrid, MapPin, Phone, MessageCircle, Settings, BarChart3, Zap, Package, CheckSquare, Users, Share2, FileText } from "lucide-react";
+import { Calculator, ClipboardList, LayoutGrid, FileText, MessageCircle, Package, Phone, CheckSquare, Users, Share2, BarChart3, Settings, MapPin, Zap } from "lucide-react";
 
 export default function HomePage() {
   return (
@@ -18,7 +18,7 @@ export default function HomePage() {
           </p>
           <Button 
             size="lg" 
-            className="bg-white text-amber-700 hover:bg-amber-100 text-lg px-8 py-4 shadow-xl"
+            className="bg-white text-amber-700 hover:bg-amber-100 text-lg px-8 py-4 shadow-xl font-bold"
           >
             ابدأ الآن
           </Button>
@@ -69,7 +69,7 @@ export default function HomePage() {
                 <span>قوالب القياس</span>
               </CardTitle>
               <CardDescription>
-                نماذج قياس جاهزة للباب، النافذ، والخزائن
+                نماذج قياس جاهزة للأبواب والنوافذ
               </CardDescription>
             </CardHeader>
           </Card>
@@ -77,7 +77,7 @@ export default function HomePage() {
           <Card className="bg-white/95 backdrop-blur-sm hover:shadow-2xl transition-all">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <MessageCircle className="w-8 h-8 text-amber-600" />
+                <Package className="w-8 h-8 text-amber-600" />
                 <span>بطاقات الوظائف</span>
               </CardTitle>
               <CardDescription>
@@ -89,11 +89,11 @@ export default function HomePage() {
           <Card className="bg-white/95 backdrop-blur-sm hover:shadow-2xl transition-all">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <MapPin className="w-8 h-8 text-amber-600" />
-                <span>التسليم</span>
+                <MessageCircle className="w-8 h-8 text-amber-600" />
+                <span>المشاريع والعملاء</span>
               </CardTitle>
               <CardDescription>
-                تتبع الطلبات وحساب تكلفة التوصيل حسب المسافة
+                إدارة المشاريع والمهام والمواد
               </CardDescription>
             </CardHeader>
           </Card>
@@ -105,19 +105,7 @@ export default function HomePage() {
                 <span>التقارير</span>
               </CardTitle>
               <CardDescription>
-                تقارير أرباح وخسائر مع رسوم بيانية تفصيلية
-              </CardDescription>
-            </CardHeader>
-          </Card>
-
-          <Card className="bg-white/95 backdrop-blur-sm hover:shadow-2xl transition-all">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Settings className="w-8 h-8 text-amber-600" />
-                <span>الإعدادات</span>
-              </CardTitle>
-              <CardDescription>
-                تبديل العملة، العملة دون إنترنت
+                تقارير أرباح وخسائر برسوم بيانية تفصيلية
               </CardDescription>
             </CardHeader>
           </Card>
@@ -131,7 +119,7 @@ export default function HomePage() {
             هل أنت نجار جديد؟
           </h2>
           <p className="text-lg text-gray-600 mb-8 text-right">
-            كل ما تحتاجه من أدوات ومعلومات في مكان واحد - مجاناً للأبد
+            كل ما تحتاجه من أدوات ومعلومات في مكان واحد - مجاناً للأبدء
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
@@ -139,14 +127,14 @@ export default function HomePage() {
               variant="outline"
               className="flex-1 text-lg py-4 border-2 border-amber-300"
             >
-              <Users className="ml-2" />
+              <Phone className="ml-2" />
               تسجيل
             </Button>
             <Button 
               size="lg"
               className="flex-1 text-lg py-4 bg-amber-600 hover:bg-amber-700"
             >
-              <Zap className="ml-2" />
+              <Users className="ml-2" />
               تصفح الكتالوج
             </Button>
           </div>
@@ -155,29 +143,29 @@ export default function HomePage() {
 
       {/* Trust Indicators */}
       <section className="container mx-auto px-4 py-16">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center max-w-4xl mx-auto">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center max-w-5xl mx-auto">
           <div className="bg-white rounded-xl p-6 shadow-lg">
             <Phone className="w-12 h-12 mx-auto text-green-600 mb-3" />
-            <h3 className="font-bold text-lg mb-2">يعمل بدون إنترنت</h3>
-            <p className="text-gray-600">تطبيق متكامل بدون الحاجة للاتصال</p>
+            <h3 className="font-bold text-lg mb-2 text-right">يعمل بدون إنترنت</h3>
+            <p className="text-gray-600 text-right">تطبيق متكامل بدون الحاجة للاتصال</p>
           </div>
 
           <div className="bg-white rounded-xl p-6 shadow-lg">
             <Share2 className="w-12 h-12 mx-auto text-blue-600 mb-3" />
-            <h3 className="font-bold text-lg mb-2">تشارك فريقك</h3>
-            <p className="text-gray-600">تعاون مع فريق العمل والزبائن</p>
+            <h3 className="font-bold text-lg mb-2 text-right">تشارك فريقك</h3>
+            <p className="text-gray-600 text-right">تعاون مع فريق العمل والزبائن</p>
           </div>
 
           <div className="bg-white rounded-xl p-6 shadow-lg">
-            <Package className="w-12 h-12 mx-auto text-purple-600 mb-3" />
-            <h3 className="font-bold text-lg mb-2">توفير الوقت</h3>
-            <p className="text-gray-600">أدوات ذكية توفر لك ساعات من العمل</p>
+            <Zap className="w-12 h-12 mx-auto text-purple-600 mb-3" />
+            <h3 className="font-bold text-lg mb-2 text-right">توفير الوقت</h3>
+            <p className="text-gray-600 text-right">أدوات ذكية توفر لك ساعات من العمل</p>
           </div>
 
           <div className="bg-white rounded-xl p-6 shadow-lg">
             <CheckSquare className="w-12 h-12 mx-auto text-red-600 mb-3" />
-            <h3 className="font-bold text-lg mb-2">لا يوجد أخطاء</h3>
-            <p className="text-gray-600">حسابات دقيقة تمنع الأغلاط</p>
+            <h3 className="font-bold text-lg mb-2 text-right">لا يوجد أخطاء</h3>
+            <p className="text-gray-600 text-right">حسابات دقيقة تمنع الأخطاء</p>
           </div>
         </div>
       </section>
