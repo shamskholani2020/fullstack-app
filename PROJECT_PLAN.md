@@ -49,7 +49,7 @@
 
 ### 4. Monetization: [A] - Free Forever
 **Revenue Model:**
-- Bader pays: Server costs, WhatsApp Business API, SMS, maintenance
+- Bader pays: Server costs, MANUAL WHATSAPP ONLY - No API, SMS, maintenance
 - Bader earns: Revenue from wood sales (app is marketing/sales tool)
 - **No subscription fees** - Always free for carpenters
 
@@ -58,9 +58,9 @@
 - More carpenters using app = more wood sales = higher revenue
 - Free forever removes barrier to adoption
 
-### 5. Development Speed: [A] - Aggressive (6-8 weeks MVP)
+### 5. Development Speed: [C] - Aggressive (8 weeks MVP)
 **Timeline:**
-- Week 1-8: MVP development (parallel tracks)
+- Week 1-8: MVP development (parallel tracks, aggressive pace)
 - Launch at Week 8
 - Post-launch: Advanced features based on feedback
 
@@ -69,6 +69,7 @@
 - Prioritized feature delivery
 - Continuous testing and feedback
 - Launch with core features, iterate post-launch
+- **NO MANUAL WHATSAPP ONLY - No API** - Use manual WhatsApp messages instead
 
 ---
 
@@ -82,7 +83,7 @@
 - [ ] Service worker setup (offline support)
 - [ ] IndexedDB integration
 - [ ] OpenStreetMap integration
-- [ ] WhatsApp Business API setup
+- [ ] MANUAL WHATSAPP ONLY - No API setup
 - [ ] SMS verification (Twilio)
 
 **Track B: UI Foundation**
@@ -512,7 +513,7 @@ Bader App
 - [ ] Offline mode working (48-hour test passed)
 - [ ] Service Worker caching functional
 - [ ] IndexedDB sync working
-- [ ] WhatsApp Business API integrated
+- [ ] MANUAL WHATSAPP ONLY - No API integrated
 - [ ] SMS verification working
 - [ ] Exchange rate API + manual working
 
@@ -549,7 +550,7 @@ Bader App
 **Legal:**
 - [ ] Privacy policy created
 - [ ] Terms of service created
-- [ ] WhatsApp Business API terms reviewed
+- [ ] MANUAL WHATSAPP ONLY - No API terms reviewed
 
 **Deployment:**
 - [ ] Supabase production project ready
