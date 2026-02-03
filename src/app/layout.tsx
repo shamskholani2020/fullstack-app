@@ -10,7 +10,7 @@ const cairo = Cairo({
 });
 
 export const metadata: Metadata = {
-  title: "بادر - Bader",
+  title: "البادر - البادر",
   description: "منصة شاملة للنجارين - أدوات، قياسات، وأكثر",
   manifest: "/manifest.json",
 };
@@ -27,8 +27,11 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" content="#8B7355" />
         <link rel="icon" href="/favicon.ico" />
+        <meta name="application-name" content="البادر" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       </head>
-      <body
+      <body>
         <main className="font-cairo antialiased">
           {children}
         </main>
