@@ -1,832 +1,605 @@
 # Bader Platform - Project Plan
 
-**Version:** 1.0  
+**Version:** 2.0  
 **Date:** February 3, 2026  
 **Location:** Rif Damascus, Darraya, Syria  
-**Status:** Research & Planning Phase
+**Status:** Planning & Acceleration Phase
 
 ---
 
-## 📋 Table of Contents
+## 📋 Interview Answers & Adjustments
 
-1. [Business Context](#business-context)
-2. [Product Catalog](#product-catalog)
-3. [User Roles & Features](#user-roles--features)
-4. [Technical Architecture](#technical-architecture)
-5. [Core Features by Priority](#core-features-by-priority)
-6. [Data Structure](#data-structure)
-7. [UX/UX Requirements](#uxux-requirements)
-8. [Offline Strategy](#offline-strategy)
-9. [Development Roadmap](#development-roadmap)
-10. [Life-Saving Utilities for Carpenters](#life-saving-utilities-for-carpenters)
+### 1. Timeline - Accelerated ✓
+- **Status:** 12 weeks realistic but in **RUSH MODE**
+- **Approach:** Work in parallel tracks, compressed timeline
+- **Strategy:** 6-8 weeks aggressive development, all features preserved
 
----
+### 2. Life-Saving Utilities - EXPANDED ✓
+- **Status:** 8 existing tools approved + **15 MORE POWERFUL tools added**
+- **Philosophy:** "Greedy Features" - So valuable carpenters think we're crazy to offer for free
 
-## 🌍 Business Context
+### 3. Data Source - Fresh Start ✓
+- **Status:** Start fresh, no Google Sheets import
+- **Action:** Admin will manually enter initial data
 
-### Location & Market
-- **Region:** Syria, Rif Damascus, Darraya
-- **Target Users:** Carpenters and contractors (capacity can scale)
-- **Business Hours:** 8am - 7pm (may vary)
-- **Team Size:** 
-  - Platform management: 1-2 people
-  - Business operations: 15-20 people
+### 4. User Accounts - Hybrid ✓
+- **Status:** Guest mode ESSENTIAL, accounts optional for premium features
+- **Action:** Everything works without login, accounts for extra benefits
 
-### Economic Factors
-- **Primary Currency:** USD
-- **Display Currencies:** USD and SYP (user can toggle)
-- **Exchange Rate:** Very dynamic (changes every minute in some cases)
-- **Payment Methods:** 
-  - Phone call (negotiated pricing)
-  - WhatsApp order confirmation
-  - No online payments
-  - No e-commerce checkout
+### 5. Exchange Rate - Hybrid with Priority ✓
+- **Status:** API as DEFAULT, manual as backup
+- **Important:** Syrian government removed two zeros
+  - **Old:** 10,000 SYP = 100 New SYP
+  - **Rate:** 1/100 conversion
 
-### Infrastructure Constraints
-- **Network:** Poor internet connectivity in the area
-- **Implication:** Offline-first approach is critical
-- **Sync Strategy:** Must support offline work with background synchronization
-
-### Language & Localization
-- **Primary Language:** Arabic (Right-to-Left)
-- **Secondary Language:** English (optional toggle)
-- **Measurement Systems:**
-  - Meter system (m³ for wood, kg for glue)
-  - Piece system (for MDF plates)
+### 6. Design - Minimalist & Beginner-Friendly ✓
+- **Status:** Simple, Sleek, Powerful
+- **Target Audience:** **First-time users** - NO technical experience expected
+- **Principles:**
+  - No hidden details
+  - No default/auto actions (everything explicit)
+  - Very obvious data
+  - Can't make mistakes
+  - "A guy who doesn't know much tech" should master it in 5 minutes
 
 ---
 
-## 🪵 Product Catalog
+## 🛠️ LIFE-SAVING UTILITIES FOR CARPENTERS (23 Total)
 
-### Product Categories
+### CORE UTILITIES (Original 8)
 
-#### 1. MDF (Medium Density Fiberboard)
-- **Variants:**
-  - Plain MDF
-  - Paper colored MDF
-  - Melamine MDF
-  - High gloss MDF
-- **Pricing Unit:** Per piece (whole plate)
-- **Typical Size:** 122cm x 244cm (sold as whole, no cuts)
-- **Display Data:** Thickness, type, price per piece
-
-#### 2. Wood (Natural Wood)
-- **Types:**
-  - Swedish Wood (سويد)
-  - Beech - Red and White (زان)
-  - Pine Wood (شوح)
-  - Red Wood
-  - White Wood
-  - Other Syrian market woods
-- **Pricing Unit:** Per cubic meter (m³)
-- **Pricing Method:** 
-  - No seeds (clean plate) = High price
-  - With seeds = Lower price
-  - Measured by: Height × Width × Length (in meters)
-- **Display Data:** Dimensions, cubic meters, price per m³, clarity indicator
-
-#### 3. Glue (غراء)
-- **Variants:** Different brands
-- **Package Sizes:**
-  - 5kg
-  - 9.5kg
-  - 20kg
-  - 25kg
-  - 45kg
-- **Pricing Unit:** Per package (price varies by brand and weight)
-- **Display Data:** Brand, weight, price per package
-
-#### 4. Carpenter Accessories
-- **Types:** Workshop accessories, hardware, tools
-- **Pricing Unit:** Per item
-- **Display Data:** Name, description, price, stock quantity
-
-#### 5. Custom Wood Products (Challenge Products)
-- **Types:**
-  - Doors (أبواب)
-  - Door Frames (إطارات أبواب)
-  - Window Frames (إطارات نوافذ)
-  - Door Surroundings (حوايط باب)
-  - Tables (طاولات)
-  - Any custom wood project
-- **Pricing Strategy:** Challenging price (competitive because carpenter can make it but takes time)
-- **Unique Selling Point:** Bader has full workshop ready - other merchants don't offer this
-- **Display Data:** Product type, dimensions, challenging price, stock
-
-### Special Services
-
-#### Cutting Service (خدمة القص)
-- **Scenario:** Client needs part of a wood plate
-- **Example:** 
-  - Full plate: 600cm × 20cm × 5cm (Swedish)
-  - Client needs: 230cm piece
-  - **Action:** Bader cuts to 230cm
-  - **Pricing:** Client pays only for taken cubic meter
-  - **Remaining:** The rest of the plate stays in Bader inventory
-- **Benefit:** Client takes exact needs without paying for full plate
-- **Display:** "Cutting service available" indicator
-
-#### Remaining Wood Flow (بقايا الخشب)
-- **Scenario:** After cuts, remaining sizes available for other clients
-- **Display:** Show available remaining sizes with prices
-- **Benefit:** Maximize inventory utilization, offer competitive prices on leftovers
-
-#### Project Measurement Service (خدمة قياس المشاريع)
-- **Offer:** Help carpenter write measurements for their projects
-- **Purpose:** Understand project type and suggest suitable products
-- **Output:** 
-  - Project measurements recorded
-  - Product suggestions based on project requirements
-- **Display:** In-app measurement tool/form
-
-### Product Data to Display
-For each product, show:
-- ✅ Name (Arabic & English)
-- ✅ Description
-- ✅ Price (USD & SYP toggle)
-- ✅ Stock quantity (if tracked)
-- ✅ Dimensions/Sizes
-- ✅ Product type/category
-- ✅ Supplier/Brand info
-- ✅ Images (for special products like doors, high-clarity Swedish doors)
-- ✅ Related/suggested products
-- ✅ Measurement unit (m³, piece, kg)
-- ✅ Clarity indicator (for Swedish wood)
-- ✅ Cutting service availability
-
----
-
-## 👥 User Roles & Features
-
-### 1. Carpenters (النجارين) - Primary Users
-
-**Goal:** Browse, search, and get product suggestions for their projects
-
-**Features:**
-- [ ] Browse all products by category
-- [ ] Search by name, type, material
-- [ ] Filter by dimensions, price range, availability
-- [ ] Sort by price, newest, popularity
-- [ ] View product details with all specifications
-- [ ] View price in USD or SYP (toggle)
-- [ ] View wood clarity indicator (no seeds vs with seeds)
-- [ ] Use measurement calculator for projects
-- [ ] Save projects/measurements (offline)
-- [ ] View product suggestions based on project type
-- [ ] Request cutting service (if applicable)
-- [ ] Place order via WhatsApp
-- [ ] Save products to favorites (offline)
-
-### 2. Admin/Manager (المدير)
-
-**Goal:** Manage inventory, view orders, manage data
-
-**Features:**
-- [ ] Add/Edit/Delete products
-- [ ] Manage product variants (dimensions, prices)
-- [ ] Upload product images
-- [ ] Set stock levels
-- [ ] View all orders
-- [ ] Update order status (pending → preparing → ready → delivered)
-- [ ] Confirm orders manually
-- [ ] Manage exchange rate (USD to SYP)
-- [ ] Generate reports (sales, inventory, popular products)
-- [ ] View business analytics
-- [ ] Manage customer database
-- [ ] Send WhatsApp notifications for order updates
-- [ ] Sync data when online
-
-### 3. Delivery Driver (سائق التوصيل) - Future
-
-**Goal:** View delivery tasks, update status
-
-**Features:**
-- [ ] View assigned deliveries
-- [ ] Get customer location
-- [ ] Navigate to customer (map integration if network allows)
-- [ ] Mark delivery as completed
-- [ ] View delivery fee based on distance
-
-### 4. Sales Team (فريق المبيعات) - Future
-
-**Goal:** Suggest products, help carpenters
-
-**Features:**
-- [ ] View customer projects
-- [ ] Suggest suitable products
-- [ ] Create quotations
-- [ ] Follow up on orders
-
----
-
-## 🏗 Technical Architecture
-
-### Frontend Stack
-- **Framework:** Next.js 16.1.6 (App Router)
-- **UI Library:** shadcn/ui 0.0.4
-- **Styling:** Tailwind CSS 4.1.18
-- **Language:** TypeScript 5
-- **Icons:** Lucide React 0.563.0
-
-### Backend/API
-- **Approach:** API Routes (Next.js)
-- **Database:** SQLite (for offline) + Supabase (sync when online)
-- **ORM:** Prisma (type-safe database access)
-- **Real-time:** Server-Sent Events (SSE) for sync
-
-### Offline-First Architecture
-```
-┌─────────────────────────────────────────┐
-│         Local Browser Storage          │
-│  ┌─────────┐  ┌─────────────┐  │
-│  │IndexedDB│  │localStorage  │  │
-│  │(Products)│  │(Preferences)│  │
-│  └─────────┘  └─────────────┘  │
-└─────────────────────────────────────────┘
-              ↓ Background Sync
-┌─────────────────────────────────────────┐
-│         Supabase / API              │
-│    (when internet is available)       │
-└─────────────────────────────────────────┘
-```
-
-### Deployment
-- **Platform:** Dokploy
-- **Domain:** https://bader.kholani.store
-- **Docker:** Multi-stage build
-- **Environment:** Production
-
----
-
-## 🎯 Core Features by Priority
-
-### Phase 1: MVP (Minimum Viable Product) - Weeks 1-4
-**Must-have features for launch:**
-
-**Product Catalog:**
-- [ ] Display all product categories
-- [ ] Product detail pages with all specifications
-- [ ] Search functionality (by name, type)
-- [ ] Basic filters (category, price range)
-- [ ] Currency toggle (USD ↔ SYP)
-- [ ] Exchange rate display
-
-**Carpenter Tools:**
-- [ ] Simple measurement calculator
-- [ ] Product suggestions (manual list)
-- [ ] Save measurements (localStorage)
-
-**Admin:**
-- [ ] Product management (CRUD)
-- [ ] Order management (view, update status)
-- [ ] Exchange rate management
-- [ ] Basic reporting
-
-**Order Flow:**
-- [ ] Place order via WhatsApp (auto-generated message)
-- [ ] Order confirmation (admin approves)
-- [ ] Order status tracking
-
-**Offline Support:**
-- [ ] Cache products in IndexedDB
-- [ ] App works without internet
-- [ ] Background sync when online
-- [ ] Progress indicators (syncing...)
-
-### Phase 2: Enhanced Features - Weeks 5-8
-**Value-add features:**
-
-**Advanced Search & Filters:**
-- [ ] Filter by dimensions (for wood)
-- [ ] Filter by clarity (clean vs seeded)
-- [ ] Filter by brand (for glue)
-- [ ] Multi-select filters
-- [ ] Save filter preferences
-
-**Cutting Service:**
-- [ ] Calculate cutting cost
-- [ ] Show remaining sizes
-- [ ] Visual cutting guide
-- [ ] Auto-generate WhatsApp message for cutting request
-
-**Measurements:**
-- [ ] Project type templates (door, window, table, etc.)
-- [ ] Smart material calculator
-- [ ] Save multiple projects
-- [ ] Export measurements as PDF/image
-
-**Suggestions:**
-- [ ] AI-powered product suggestions (based on project type)
-- [ ] Material compatibility checker
-- [ ] History-based suggestions
-
-**Enhanced Admin:**
-- [ ] Inventory tracking (low stock alerts)
-- [ ] Advanced analytics
-- [ ] Customer management
-- [ ] Bulk product import
-
-### Phase 3: Advanced Features - Weeks 9+
-**Future enhancements:**
-
-**Delivery:**
-- [ ] Delivery driver portal
-- [ ] Distance-based delivery fee calculator
-- [ ] GPS navigation (if network allows)
-- [ ] Delivery route optimization
-
-**Sales Team:**
-- [ ] Sales dashboard
-- [ ] Quotation builder
-- [ ] Customer relationship management (CRM)
-- [ ] Follow-up reminders
-
-**Community:**
-- [ ] User accounts (carpenters can save preferences)
-- [ ] Reviews/ratings system
-- [ ] Photo gallery (carpenters can share projects)
-- [ ] Tips & tutorials
-
----
-
-## 📊 Data Structure
-
-### Product Schema
-```typescript
-interface Product {
-  id: string;
-  nameAr: string;
-  nameEn: string;
-  category: ProductCategory;
-  type: ProductType;
-  priceUSD: number;
-  descriptionAr?: string;
-  descriptionEn?: string;
-  specifications: ProductSpecs;
-  images?: string[];
-  stock?: number;
-  supplier?: string;
-  brand?: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-type ProductCategory = 
-  | 'mdf' 
-  | 'wood' 
-  | 'glue' 
-  | 'accessories' 
-  | 'custom-wood';
-
-type ProductType =
-  | 'plain-mdf'
-  | 'colored-mdf'
-  | 'melamine-mdf'
-  | 'high-gloss-mdf'
-  | 'swedish-wood'
-  | 'beech-red'
-  | 'beech-white'
-  | 'pine'
-  | 'red-wood'
-  | 'white-wood'
-  | 'glue'
-  | 'accessory'
-  | 'door'
-  | 'door-frame'
-  | 'window-frame'
-  | 'door-surround'
-  | 'table'
-  | 'custom-wood';
-
-interface ProductSpecs {
-  // MDF
-  thickness?: number; // mm
-  dimensions?: {
-    length: number; // cm
-    width: number; // cm
-  };
-  pricingUnit: 'piece' | 'cubic-meter' | 'kg';
-  
-  // Wood
-  clarity?: 'clean' | 'seeded';
-  dimensions?: {
-    height: number; // m
-    width: number; // m
-    length: number; // m
-  };
-  
-  // Glue
-  weight?: number; // kg
-  brand?: string;
-  
-  // Custom wood
-  productType?: string;
-  customDimensions?: string;
-}
-
-interface CuttingService {
-  productId: string;
-  requestedSize: {
-    length: number;
-    width: number;
-    height?: number;
-  };
-  calculatedPrice: number;
-  remainingSize?: {
-    length: number;
-    width: number;
-    height?: number;
-    price: number;
-  };
-  status: 'pending' | 'approved' | 'ready';
-}
-```
-
-### Order Schema
-```typescript
-interface Order {
-  id: string;
-  customerName: string;
-  customerPhone: string;
-  items: OrderItem[];
-  totalUSD: number;
-  totalSYP?: number;
-  delivery?: {
-    type: 'pickup' | 'delivery';
-    location?: string;
-    distance?: number; // km
-    fee?: number; // USD
-  };
-  status: 'pending' | 'confirmed' | 'preparing' | 'ready' | 'delivered' | 'cancelled';
-  orderDate: Date;
-  notes?: string;
-  sentVia: 'whatsapp' | 'phone' | 'in-person';
-}
-
-interface OrderItem {
-  productId: string;
-  productName: string;
-  quantity: number;
-  priceUSD: number;
-  cuttingService?: CuttingService;
-}
-```
-
-### Project/Measurement Schema
-```typescript
-interface Project {
-  id: string;
-  userId?: string;
-  name: string;
-  type: ProjectType;
-  measurements: Measurement[];
-  suggestedProducts: Product[];
-  status: 'draft' | 'in-progress' | 'completed';
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-type ProjectType =
-  | 'door'
-  | 'window'
-  | 'table'
-  | 'cabinet'
-  | 'shelf'
-  | 'other';
-
-interface Measurement {
-  name: string;
-  value: number;
-  unit: 'cm' | 'm' | 'mm';
-  notes?: string;
-}
-```
-
-### Exchange Rate Schema
-```typescript
-interface ExchangeRate {
-  id: string;
-  usdToSYP: number;
-  timestamp: Date;
-  source: 'manual' | 'api';
-}
-```
-
----
-
-## 🎨 UX/UX Requirements
-
-### Mobile-First Design
-- **Primary Device:** Mobile phones (carpenters on-site)
-- **Key Considerations:**
-  - Large touch targets (min 44px)
-  - Readable text (min 16px)
-  - Simple navigation
-  - One-handed use support
-  - Fast load times
-  - Work in landscape mode (for better view)
-
-### Arabic RTL Support
-- **Text Direction:** Right-to-Left (RTL)
-- **Font:** Noto Sans Arabic or Cairo
-- **Numbers:** Use Arabic numerals option
-- **Date Format:** DD/MM/YYYY (Arabic locale)
-- **Input:** RTL text fields, LTR numbers
-
-### Color Scheme
-- **Primary:** Warm wood tones (browns, beiges)
-- **Accent:** Green (growth, success) or Orange (wood, industry)
-- **Background:** Light (clean, professional)
-- **Text:** High contrast (dark on light)
-- **Accessibility:** WCAG AA compliance
-
-### User Flows
-
-#### Carpenter Flow (Browsing & Ordering)
-```
-1. Open App → See Categories
-2. Select Category → View Products
-3. Search/Filter → Find Product
-4. View Details → See Specs, Price (USD/SYP toggle)
-5. Save to Favorites (Optional)
-6. Add to "Order List" (Not cart - just list)
-7. Review Order List
-8. Click "Order via WhatsApp"
-9. Open WhatsApp with pre-filled message
-10. Wait for admin confirmation
-```
-
-#### Admin Flow (Order Management)
-```
-1. Login to Dashboard
-2. See New Orders Badge
-3. Click Order → View Details
-4. Approve/Reject Order
-5. Update Status (Preparing → Ready)
-6. Send WhatsApp Notification
-7. Assign to Delivery (if applicable)
-8. Mark as Delivered
-```
-
-#### Carpenter Flow (Measurement Tool)
-```
-1. Open "My Projects"
-2. Click "New Project"
-3. Select Project Type (Door, Window, etc.)
-4. Enter Measurements
-5. App Suggests Products
-6. Carpenter Adjusts/Saves
-7. View "What You Need" List
-8. Click "Order Suggestions"
-```
-
----
-
-## 📴 Offline Strategy
-
-### Architecture
-```
-┌─────────────────────────────────────┐
-│         Service Worker              │
-│  (Offline Cache & Sync)         │
-└─────────────────────────────────────┘
-              ↓ Cache
-┌─────────────────────────────────────┐
-│         IndexedDB                 │
-│  (Products, Orders, Settings)    │
-└─────────────────────────────────────┘
-              ↓ Sync (when online)
-┌─────────────────────────────────────┐
-│         Supabase / API           │
-│  (Source of Truth)              │
-└─────────────────────────────────────┘
-```
-
-### Cache Strategy
-- **Products:** Cache all products on app load, refresh every 24h
-- **Orders:** Save locally, sync when online
-- **Settings:** Save locally (currency, language)
-- **Images:** Cache frequently viewed images
-
-### Sync Strategy
-- **Automatic:** Background sync every 5 minutes when online
-- **Manual:** "Sync Now" button in settings
-- **Conflict Resolution:** Last-write-wins with user notification
-- **Progress:** Show sync status with retry button
-
-### Network Detection
-- **Online:** Show online indicator, enable sync
-- **Offline:** Show offline badge, work normally
-- **Reconnecting:** Show progress, queue changes
-
----
-
-## 🛣 Development Roadmap
-
-### Week 1-2: Setup & Core Structure
-- [ ] Set up Next.js project structure
-- [ ] Configure RTL and Arabic support
-- [ ] Set up Supabase integration
-- [ ] Create database schema
-- [ ] Set up IndexedDB for offline
-- [ ] Implement service worker
-- [ ] Create base UI components (layout, navigation)
-
-### Week 3-4: Product Catalog (MVP)
-- [ ] Product listing page
-- [ ] Product detail page
-- [ ] Search functionality
-- [ ] Basic filters
-- [ ] Currency toggle (USD/SYP)
-- [ ] Exchange rate display
-- [ ] Product images support
-- [ ] Admin product management (CRUD)
-
-### Week 5-6: Order System & Measurements
-- [ ] Order list feature
-- [ ] WhatsApp order integration
-- [ ] Admin order management
-- [ ] Order status tracking
-- [ ] Measurement calculator tool
-- [ ] Project templates
-- [ ] Product suggestions
-- [ ] Save projects feature
-
-### Week 7-8: Cutting Service & Offline
-- [ ] Cutting service UI
-- [ ] Calculate cutting cost
-- [ ] Show remaining sizes
-- [ ] Service worker implementation
-- [ ] IndexedDB integration
-- [ ] Background sync
-- [ ] Offline indicator
-- [ ] Network detection
-- [ ] Conflict resolution
-
-### Week 9-10: Admin Advanced & Testing
-- [ ] Advanced admin dashboard
-- [ ] Inventory tracking
-- [ ] Analytics & reports
-- [ ] Exchange rate management
-- [ ] WhatsApp notification system
-- [ ] Performance optimization
-- [ ] Mobile responsiveness testing
-- [ ] Offline flow testing
-- [ ] RTL testing
-
-### Week 11-12: Polish & Launch
-- [ ] UI/UX refinements
-- [ ] Accessibility audit
-- [ ] Security review
-- [ ] Performance optimization
-- [ ] Bug fixes
-- [ ] User testing with carpenters
-- [ ] Documentation
-- [ ] Deployment to Dokploy
-- [ ] Launch! 🚀
-
----
-
-## 🛠️ Life-Saving Utilities for Carpenters
-
-### 1. Material Calculator (آلة الحاسبة)
-**Purpose:** Calculate exact material needed for projects
-
+#### 1. Material Calculator (آلة الحاسبة)
 **Templates:**
-- [ ] **Door Calculator:**
-  - Input: Door dimensions, type (single/double), material
-  - Output: Required wood quantity (m³), estimated price
-  
-- [ ] **Window Calculator:**
-  - Input: Window dimensions, number of sections
-  - Output: Required wood quantity, frame requirements
-  
-- [ ] **Table Calculator:**
-  - Input: Table dimensions, leg type
-  - Output: Required wood quantity, surface area
+- [ ] **Door Calculator:** Door dimensions, type (single/double), material → Required wood quantity (m³), estimated price
+- [ ] **Window Calculator:** Window dimensions, sections → Required wood, frame requirements
+- [ ] **Table Calculator:** Dimensions, leg type → Required wood, surface area
+- [ ] **Cabinet Calculator:** Dimensions, shelves, doors → Required MDF/wood
+- [ ] **General Calculator:** Custom dimensions, material selection → Quantity needed
 
-- [ ] **Cabinet Calculator:**
-  - Input: Cabinet dimensions, shelves, doors
-  - Output: Required MDF/wood quantity
-
-- [ ] **General Calculator:**
-  - Custom dimensions
-  - Select material
-  - Calculate needed quantity
-
-### 2. Cutting Optimizer (محسن القص)
-**Purpose:** Maximize usage, minimize waste
-
+#### 2. Cutting Optimizer (محسن القص)
 **Features:**
 - [ ] Input multiple project requirements
 - [ ] Algorithm suggests optimal cuts from available plates
-- [ ] Visual cutting plan
-- [ ] Show remaining material
-- [ ] Calculate total cost (actual vs theoretical)
+- [ ] Visual cutting plan (diagram)
+- [ ] Show remaining material with price
+- [ ] Calculate waste vs. used
 
-### 3. Project Cost Estimator (مقدر تكلفة المشاريع)
-**Purpose:** Quick price estimation for quotes
-
+#### 3. Project Cost Estimator (مقدر تكلفة المشاريع)
 **Features:**
 - [ ] Add project items (materials, quantities)
-- [ ] Include labor hours estimation
-- [ ] Add delivery cost (if applicable)
-- [ ] Include cutting service cost
-- [ ] Total estimation in USD and SYP
-- [ ] Export as PDF (for customer quotes)
+- [ ] Labor hours estimation
+- [ ] Delivery cost calculator
+- [ ] Cutting service cost
+- [ ] Total in USD and SYP
+- [ ] **PROFESSIONAL QUOTE EXPORT** - Send to client as PDF
 
-### 4. Measurement Templates (قوالب القياس)
-**Purpose:** Standardized measurement forms
-
+#### 4. Measurement Templates (قوالب القياس)
 **Templates:**
-- [ ] Door measurement form (standard sizes, custom)
-- [ ] Window measurement form (types, styles)
+- [ ] Door measurement form
+- [ ] Window measurement form
 - [ ] Kitchen cabinet form (L-shape, U-shape, linear)
-- [ ] Wardrobe form (dimensions, doors, drawers)
+- [ ] Wardrobe form
 - [ ] Custom project form
 
-### 5. Material Converter (محول المواد)
-**Purpose:** Convert between units for carpenters
-
+#### 5. Material Converter (محول المواد)
 **Conversions:**
 - [ ] Cubic meters ↔ Square meters
-- [ ] Cubic meters ↔ Lineal meters
-- [ ] Lineal meters ↔ Pieces
+- [ ] Cubic meters ↔ Linear meters
+- [ ] Linear meters ↔ Pieces
 - [ ] MDF pieces ↔ Area
-- [ ] Wood clarity impact on price
+- [ ] Wood clarity price impact
 
-### 6. Quick Reference Guide (دليل المرجع السريع)
-**Purpose:** Quick reference for carpenters
-
+#### 6. Quick Reference Guide (دليل المرجع السريع)
 **Content:**
 - [ ] Standard wood sizes table
 - [ ] Standard door/window dimensions
-- [ ] Material properties table (density, strength)
-- [ ] Common calculations formulas
+- [ ] Material properties (density, strength)
+- [ ] Common calculation formulas
 - [ ] Measurement shortcuts
 
-### 7. Project Checklist (قائمة التحقق للمشاريع)
-**Purpose:** Ensure nothing forgotten before starting
-
+#### 7. Project Checklist (قائمة التحقق للمشاريع)
 **Checklists:**
-- [ ] Door project checklist (materials, tools, measurements)
+- [ ] Door project checklist
 - [ ] Window project checklist
 - [ ] Furniture project checklist
 - [ ] Kitchen project checklist
-- [ ] Custom checklist (create your own)
+- [ ] Custom checklist builder
 
-### 8. Image Gallery (معرض الصور)
-**Purpose:** Reference for design ideas
-
-**Categories:**
-- [ ] Door designs
-- [ ] Window designs
-- [ ] Cabinet designs
-- [ ] Table designs
-- [ ] Custom projects
+#### 8. Image Gallery (معرض الصور)
+**Features:**
+- [ ] Design references (doors, windows, cabinets)
 - [ ] Save user's own project photos
+- [ ] Mark measurements on photos
+- [ ] Compare with Bader catalog
 
 ---
 
-## 🔐 Security & Performance
+### POWERFUL "GREEDY" UTILITIES (15 New)
 
-### Security
-- [ ] Admin authentication (phone number or email)
-- [ ] Input validation (all forms)
-- [ ] XSS protection
-- [ ] SQL injection prevention (ORM usage)
-- [ ] Rate limiting (API calls)
+#### 9. 💰 Profit/Loss Calculator (حاسبة الربح والخسارة)
+**Why it's greedy:** Shows carpenter their ACTUAL profit, helps them charge properly
 
-### Performance
-- [ ] Lazy load images
-- [ ] Pagination for product lists
-- [ ] Service worker caching
-- [ ] Optimize images (WebP, compression)
-- [ ] Code splitting (Next.js automatic)
+**Features:**
+- [ ] Input: Material cost + Labor cost + Delivery + Cutting
+- [ ] Input: Client charge (final price)
+- [ ] Calculate: Actual profit (amount and percentage)
+- [ ] **"Am I undercharging?" warning** - If profit is too low
+- [ ] **"Am I overcharging?" warning** - If profit is unrealistic
+- [ ] History: Track all project profits over time
+- [ ] **Monthly profit summary** - Total earnings dashboard
+- [ ] Export to CSV for accounting
+
+#### 10. 🗑️ Waste Cost Calculator (حاسبة تكلفة الهدر)
+**Why it's greedy:** Shows how much money is literally going in the trash
+
+**Features:**
+- [ ] Input project dimensions
+- [ ] Input available material sizes
+- [ ] Calculate: Optimal usage vs. actual needed
+- [ ] Show: Waste amount (in m³ and $$)
+- [ ] **"Waste value" display** - "You're throwing away $50 of wood"
+- [ ] Suggest: Better material sizes to minimize waste
+- [ ] **"Total waste this month"** - Track cumulative losses
+
+#### 11. 👷 Labor Cost Estimator (مقدر تكلفة العمل)
+**Why it's greedy:** Helps carpenter price their time correctly - don't undersell
+
+**Features:**
+- [ ] Project type: Door (3 days), Window (2 days), Kitchen (10 days), etc.
+- [ ] Experience level: Junior, Mid, Expert (affects suggested rate)
+- [ ] Location adjustment: Damascus vs. Darraya (transport costs)
+- [ ] Suggested hourly/daily rate in USD
+- [ ] Calculate total labor cost
+- [ ] **"This is below market rate" warning**
+- [ ] **"This is above market rate" warning**
+- [ ] Save custom rates per client
+
+#### 12. 📅 Multi-Project Schedule Planner (مخطط مشاريع متعدد)
+**Why it's greedy:** Manage 10+ projects at once, never miss a deadline
+
+**Features:**
+- [ ] Add multiple projects with deadlines
+- [ ] **Calendar view:** See all projects on timeline
+- [ ] **Conflict detection:** "You promised 2 clients for same day!"
+- [ ] Drag-and-drop reschedule
+- [ ] **"What's due this week"** dashboard
+- [ ] **"Overdue projects"** urgent notifications
+- [ ] Share schedule with team (if multiple carpenters)
+- [ ] Export schedule (PDF for client)
+
+#### 13. 📄 Professional Quote Generator (مولد عروض احترافية)
+**Why it's greedy:** Makes carpenter look professional, win more clients
+
+**Features:**
+- [ ] Auto-generate quote from project
+- [ ] **BADER BRANDING** (logo, colors, contact)
+- [ ] Professional layout (items, prices, terms)
+- [ ] Convert to PDF
+- [ ] **"Send via WhatsApp" button** - Attach PDF automatically
+- [ ] Multiple quote templates (simple, detailed)
+- [ ] Save sent quotes history
+- [ ] **"Follow up" reminders** - "You sent this 5 days ago, did client reply?"
+
+#### 14. 📊 Material Price History Tracker (تتبع أسعار المواد)
+**Why it's greedy:** Shows when to buy bulk, save hundreds
+
+**Features:**
+- [ ] Track price changes over time for each product
+- [ ] **Price trend graph** - "MDF going UP, buy now!"
+- [ ] **"Price at lowest point" indicator**
+- [ ] Alert: "Price dropped 20% since last purchase"
+- [ ] Bulk buying recommendations
+- [ ] Compare suppliers (who's cheapest today?)
+- [ ] Forecast: "Expected to rise next month"
+
+#### 15. 🔄 Quick Unit Converter (محول وحدات سريع)
+**Why it's greedy:** No more wrong calculations, prevent costly mistakes
+
+**Features:**
+- [ ] **All conversions on ONE SCREEN**
+- [ ] cm ↔ m ↔ inch ↔ foot ↔ yard
+- [ ] mm ↔ cm ↔ m
+- [ ] m³ ↔ m² ↔ linear m
+- [ ] **"Real-time" conversion** - Type in any field, all update
+- [ ] **"Carpenter shortcut keys"** - Most used conversions at top
+- [ ] History: Recently used conversions
+- [ ] Copy result to clipboard
+
+#### 16. 📸 Photo Measurement Markup (تحديد القياس على الصور)
+**Why it's greedy:** Take photo of space, mark measurements directly on it
+
+**Features:**
+- [ ] Upload/camera capture project space photo
+- [ ] Draw measurement lines and write values
+- [ ] Add notes on specific areas
+- [ ] Calculate area/length from markup
+- [ ] **"Auto-calculate from markup"** - Draw rectangle → get dimensions
+- [ ] Save marked-up photo
+- [ ] Share marked photo with team/client
+- [ ] Export as image (send via WhatsApp)
+
+#### 17. 🎙️ Voice Notes Recording (تسجيل ملاحظات صوتية)
+**Why it's greedy:** Hands-free when measuring, can't forget details
+
+**Features:**
+- [ ] Record voice note during project inspection
+- [ ] Auto-transcribe to text (when online)
+- [ ] Tag notes by project
+- [ ] **"Remind me in 2 days"** - Set reminder from note
+- [ ] Search notes (find that measurement you recorded last week)
+- [ ] Share voice note (WhatsApp, email)
+- [ ] Save offline, sync when online
+
+#### 18. 📋 Business Budget Tracker (تتبع ميزانية العمل)
+**Why it's greedy:** Know exactly where money goes, grow business
+
+**Features:**
+- [ ] Monthly income tracking
+- [ ] Monthly expense tracking (materials, tools, transport, etc.)
+- [ ] **"Net profit this month"** dashboard
+- [ ] **"You're spending too much on X"** warnings
+- [ ] Compare with last month
+- [ ] Export for tax/accounting
+- [ ] **"Yearly projection"** - "At this rate, you'll earn $XX this year"
+
+#### 19. 🔍 Smart Material Finder (الباح الذكي عن المواد)
+**Why it's greedy:** "I need X mm MDF, who has it NOW?" - Save hours of calling
+
+**Features:**
+- [ ] Enter required dimensions/specs
+- [ ] Search ALL suppliers simultaneously
+- [ ] **"Who has it in stock?"** indicator
+- [ ] **"Who's closest?"** - Distance from project location
+- [ ] **"Best price"** - Auto-compare
+- [ ] **"Total cost with delivery"** calculation
+- [ ] Call supplier directly from app
+- [ ] Add to comparison list
+
+#### 20. 🚚 Delivery Route Optimizer (محسن مسار التوصيل)
+**Why it's greedy:** Save fuel, time, do more deliveries in same day
+
+**Features:**
+- [ ] Add multiple delivery locations
+- [ ] **Optimal route calculation** - Visit all in shortest distance
+- [ ] **Map view** (if online, shows route)
+- [ ] **"Saved kilometers"** - "You drove 50km less today!"
+- [ ] **"Saved fuel cost"** calculation
+- [ ] **"Can add 1 more delivery?"** - Suggest nearby stops
+- [ ] Print route list
+
+#### 21. ⏰ Work Hour Tracker (تتبع ساعات العمل)
+**Why it's greedy:** Know EXACTLY how long each project took, price accurately
+
+**Features:**
+- [ ] Timer per project
+- [ ] Manual entry (if forgot timer)
+- [ ] **"Actual vs. estimated"** comparison
+- [ ] **"You underpriced this project!"** - Took 10 hours, estimated 5
+- [ ] Weekly work hours summary
+- [ ] **"Average time for doors/windows"** - Build better estimates
+- [ ] Export timesheet
+
+#### 22. 🔧 Tool Cost Calculator (حاسبة تكلفة الأدوات)
+**Why it's greedy:** Know how much tools cost, price jobs better
+
+**Features:**
+- [ ] Tool inventory (saws, drills, sanders, etc.)
+- [ ] Purchase date & cost
+- [ ] **"Tool amortization per project"** - "This saw costs you $0.50 per door"
+- [ ] Maintenance cost tracking
+- [ ] **"Total tool cost this year"**
+- [ ] **"Should you buy or rent?"** recommendation
+- [ ] Tool sharing with team
+
+#### 23. 💡 Project Idea Generator (مولد أفكار مشاريع)
+**Why it's greedy:** "I'm out of work, what should I build?"
+
+**Features:**
+- [ ] Input available material
+- [ ] Suggest projects by profitability
+- [ ] **"Most profitable in your area"** - Based on market demand
+- [ ] **"Quick cash projects"** - 1-day jobs
+- [ ] **"High-value projects"** - Multi-week jobs
+- [ ] Difficulty level indicator
+- [ ] Estimated time & profit
+- [ ] Filter by tools you have
 
 ---
 
-## 📝 Next Steps
+## 🚀 Accelerated Development Roadmap
 
-### Immediate Actions
-1. **Review this plan** - Confirm all requirements captured
-2. **Approve roadmap** - Confirm phase priorities and timeline
-3. **Stage organization** - Define transition between stages
-4. **Start development** - Begin with Phase 1 setup
+### Week 1-2: Foundation & Core Utilities (Aggressive)
+**Track A: Core App**
+- [ ] Next.js project structure setup
+- [ ] RTL + Arabic configuration
+- [ ] Supabase + IndexedDB setup
+- [ ] Service worker (offline)
+- [ ] Basic layout (navigation, categories)
 
-### Questions Before Development Start
-1. Do you want user registration/accounts for carpenters?
-2. Should we integrate the existing Google Sheets as initial data source?
-3. Who will manage the exchange rate updates? (Manual or API?)
-4. Should we support multiple admin users with different permissions?
-5. Any specific design preferences? (Colors, logo, branding)
+**Track B: Core Utilities (6 tools)**
+- [ ] Material Calculator
+- [ ] Quick Unit Converter
+- [ ] Measurement Templates
+- [ ] Project Checklist
+- [ ] Basic Reference Guide
+- [ ] Image Gallery
+
+**Track C: Product System**
+- [ ] Product database schema
+- [ ] Product CRUD (admin)
+- [ ] Product listing page
+- [ ] Product detail page
+- [ ] Search + basic filters
+- [ ] Currency toggle (USD/SYP)
+- [ ] Exchange rate API integration
+
+### Week 3-4: Advanced Utilities + Order System
+**Track A: Advanced Utilities (8 tools)**
+- [ ] Cutting Optimizer
+- [ ] Cost Estimator
+- [ ] Material Converter
+- [ ] Photo Measurement Markup
+- [ ] Voice Notes
+- [ ] Material Price History
+- [ ] Smart Material Finder
+- [ ] Work Hour Tracker
+
+**Track B: Order System**
+- [ ] Order list feature
+- [ ] WhatsApp order generation
+- [ ] Admin order management
+- [ ] Order status tracking
+- [ ] WhatsApp notifications
+- [ ] Delivery fee calculator
+
+### Week 5-6: Business Tools + Polish
+**Track A: Business Tools (6 tools)**
+- [ ] Profit/Loss Calculator
+- [ ] Waste Cost Calculator
+- [ ] Labor Cost Estimator
+- [ ] Quote Generator
+- [ ] Budget Tracker
+- [ ] Tool Cost Calculator
+
+**Track B: Remaining Tools (3 tools)**
+- [ ] Multi-Project Schedule
+- [ ] Delivery Route Optimizer
+- [ ] Project Idea Generator
+
+**Track C: Polish & UX**
+- [ ] First-time user onboarding
+- [ ] Explicit UI (no hidden actions)
+- [ ] Obvious data display
+- [ ] Error prevention (can't make mistakes)
+- [ ] Mobile testing
+- [ ] Performance optimization
+
+### Week 7-8: Advanced Features & Testing
+**Track A: Advanced Features**
+- [ ] AI-powered product suggestions
+- [ ] Material compatibility checker
+- [ ] Bulk product import
+- [ ] Advanced analytics
+- [ ] Inventory tracking with alerts
+- [ ] Customer management
+
+**Track B: Testing & Launch**
+- [ ] Complete flow testing (all 23 utilities)
+- [ ] Offline flow testing
+- [ ] Network switching testing
+- [ ] RTL testing (Arabic)
+- [ ] New user testing (non-technical)
+- [ ] Bug fixes
+- [ ] Performance optimization
+- [ ] **DEPLOY TO DOKPLOY**
 
 ---
 
-**Document Status:** Ready for review  
-**Last Updated:** February 3, 2026  
-**Next Review:** After Stage approval
+## 🎨 Design Philosophy - Beginner-Friendly
+
+### Core Principles
+1. **NO HIDDEN ACTIONS** - Everything explicit
+2. **NO DEFAULTS** - User chooses everything
+3. **NO ASSUMPTIONS** - State everything clearly
+4. **NO TECH JARGON** - Plain language
+5. **NO COMPLEXITY** - One screen = One task
+
+### Visual Design
+
+**Minimalist:**
+- Clean white background
+- High contrast text
+- Large, clear typography
+- Plenty of whitespace
+
+**Simple Navigation:**
+- **Hamburger menu** - Always visible, not hidden
+- **Tab bar at bottom** - Easy thumb access (mobile)
+- **Back button** - Always visible, no gestures
+- **Home button** - One tap to start
+
+**Obvious Buttons:**
+- Primary action: BIG, GREEN
+- Secondary action: Medium, GRAY
+- Cancel action: RED
+- **ALL BUTTONS HAVE TEXT LABELS** - No icons only
+
+**Data Display:**
+- Numbers: BIG FONT
+- Currency: Symbol BEFORE number ($100 not 100$)
+- Negative values: RED color
+- Positive values: GREEN color
+- Empty states: "Tap here to add [item]"
+
+### Onboarding - First-Time User
+
+**Welcome Screen (Mandatory):**
+- [ ] **"What do you do?"** - Carpenter, Admin, Sales
+- [ ] Skip option: "I'm just browsing"
+- [ ] Language selection: Arabic / English
+
+**First Time Carpenter:**
+- [ ] Quick tutorial: 3 screens, swipe to learn
+- [ ] Screen 1: "This is your catalog - tap products"
+- [ ] Screen 2: "This saves your calculations - tap tools"
+- [ ] Screen 3: "Tap here to start browsing"
+- [ ] Can skip anytime, can see again in settings
+
+**Error Prevention:**
+- [ ] Confirmation dialogs before deleting
+- [ ] "Are you sure?" on important actions
+- [ ] Undo option for 5 seconds
+- [ ] Can't navigate without saving (shows warning)
 
 ---
 
-**End of Research & Planning Phase** 🎉
+## 💱 Currency System
+
+### Exchange Rate Logic
+
+**New Syrian Pound Rule:**
+```javascript
+// Conversion: Old SYP to New SYP
+// 10,000 Old SYP = 100 New SYP
+
+const NEW_SYP_PER_OLD_SYP = 100 / 10000; // 0.01
+
+// Example:
+const priceInOldSYP = 50000; // 50,000 Old SYP
+const priceInNewSYP = priceInOldSYP * NEW_SYP_PER_OLD_SYP; // 500 New SYP
+
+// Display to user:
+"Price: 50,000 Old SYP = 500 New SYP"
+```
+
+**Dual Display Mode:**
+```
+[Product: MDF Plain 16mm]
+Price: $12.50 USD
+       = 1,250,000 Old SYP
+       = 12,500 New SYP (PRIMARY DISPLAY)
+```
+
+**API + Manual Fallback:**
+```javascript
+// Default: Try API first
+let exchangeRate = await fetchExchangeRate(); // API
+
+// Fallback: If API fails, use last known rate
+if (!exchangeRate) {
+  exchangeRate = localStorage.getItem('lastKnownRate');
+}
+
+// Admin can override manually
+if (adminOverride) {
+  exchangeRate = adminOverride;
+  saveToDatabase(exchangeRate);
+}
+```
+
+### Display Format
+
+**Everywhere money appears:**
+```
+[PRIMARY]    $12.50 USD
+[SECONDARY] 12,500 New SYP
+[REFERENCE]  1,250,000 Old SYP (small, gray)
+```
+
+---
+
+## 🗂 Updated Data Structure
+
+### Exchange Rate Schema (Updated)
+```typescript
+interface ExchangeRate {
+  id: string;
+  usdToOldSYP: number;    // e.g., 13,500
+  usdToNewSYP: number;    // e.g., 135
+  conversionRatio: number;   // 0.01 (10,000 old = 100 new)
+  timestamp: Date;
+  source: 'api' | 'manual' | 'government-announcement';
+  isOfficialRate: boolean; // From government announcement
+}
+```
+
+---
+
+## 🎯 Success Metrics
+
+### After Launch (Week 8)
+- [ ] App loads in < 3 seconds (offline)
+- [ ] First-time user completes first calculation in < 1 minute
+- [ ] All 23 utilities accessible within 3 taps
+- [ ] No user can make a "wrong" action (too many protections)
+- [ ] Works completely offline for 48 hours
+
+### After 1 Month
+- [ ] 50+ carpenters actively using
+- [ ] 10+ admins managing inventory
+- [ ] 100+ quotes generated
+- [ ] < 5% crash rate
+- [ ] < 10s sync time when online
+
+---
+
+## 🚨 Risk Mitigation
+
+### Technical Risks
+- **Network issues:** → Complete offline mode already designed
+- **Exchange rate volatility:** → Real-time API + manual override
+- **Large image storage:** → Compress images, cache frequently used
+- **Device compatibility:** → Test on old Android phones (5+ years old)
+
+### User Risks
+- **First-time confusion:** → Mandatory onboarding, explicit UI
+- **Wrong calculations:** → Validation on every input, show expected ranges
+- **Data loss:** → Auto-save every 30 seconds
+- **Admin errors:** → Undo button, backup daily
+
+---
+
+## 📝 Final Questions Before Development
+
+### Development Decisions
+1. **Supabase vs. Local Only:**
+   - Option A: Supabase cloud + local sync (recommended)
+   - Option B: Local SQLite only (simpler, no sync)
+   - *Your choice?*
+
+2. **Map Integration:**
+   - Full Google Maps (needs API key, costs money)
+   - OpenStreetMap (free, less detailed)
+   - No maps (just distance in km)
+   - *Your choice?*
+
+3. **Push Notifications:**
+   - Use (web push, needs service worker)
+   - No (just check manually)
+   - *Your choice?*
+
+4. **WhatsApp Integration:**
+   - Auto-send via WhatsApp Business API (costs money, reliable)
+   - Just open WhatsApp with message (free, manual)
+   - *Your choice?*
+
+5. **Admin Auth:**
+   - Phone number (SMS verification)
+   - Email + Password
+   - No auth (anyone can access admin panel)
+   - *Your choice?*
+
+---
+
+## 🎉 READY FOR DEVELOPMENT
+
+**Plan Version:** 2.0  
+**Status:** Approved for accelerated development  
+**Total Features:** 23 Life-Saving Utilities  
+**Target:** Launch in 6-8 weeks  
+
+**NEXT:** Await final decisions → Begin Week 1
+
+---
+
+**End of Planning Phase** 🚀
