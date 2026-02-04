@@ -109,7 +109,7 @@ CREATE TABLE exchange_rates (
     usd_to_new_syp DECIMAL(15, 2) NOT NULL, -- e.g., 135
     conversion_ratio DECIMAL(10, 4) DEFAULT 0.01, -- 0.01 (100/10000)
     timestamp TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    source VARCHAR(20) DEFAULT 'api', -- 'api', 'manual', 'government-announcement'
+    source VARCHAR(50) DEFAULT 'api', -- 'api', 'manual', 'government-announcement'
     is_official_rate BOOLEAN DEFAULT FALSE -- From government announcement
 );
 
