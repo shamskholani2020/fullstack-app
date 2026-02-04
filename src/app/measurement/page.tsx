@@ -1,10 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Calculator, ArrowLeft, ArrowRight, Trash2, Save, Plus } from "lucide-react";
+import { getMeasurements, createMeasurement, deleteMeasurement } from "@/lib/supabase";
+
+interface Measurement {
+  id: string;
+  project_name: string;
+  measurements: {
+    width: number;
+    height: number;
+    length: number;
+    unit: string;
+    area: number;
+    volume: number;
+    area_ft2: number;
+    volume_ft3: number;
+  };
+  created_at: string;
+}
 
 export default function MeasurementHelper() {
   const [roomName, setRoomName] = useState("");
@@ -12,7 +29,27 @@ export default function MeasurementHelper() {
   const [height, setHeight] = useState("");
   const [length, setLength] = useState("");
   const [unit, setUnit] = useState<"m" | "cm" | "mm">("m");
-  const [savedMeasurements, setSavedMeasurements] = useState<Array<{id: string; room: string; width: string; height: string; length: string; unit: string}>>([]);
+  const [savedMeasurements, setSavedMeasurements] = useState<Measurement[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  // Load measurements from Supabase on mount
+  useEffect(() => {
+    loadMeasurements();
+  }, []);
+
+  async function loadMeasurements() {
+    try {
+      setLoading(true);
+      const data = await getMeasurements();
+      if (data) {
+        setSavedMeasurements(data);
+      }
+    } catch (error) {
+      console.error("Error loading measurements:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   const calculateArea = () => {
     const w = parseFloat(width) || 0;
@@ -51,33 +88,75 @@ export default function MeasurementHelper() {
   };
 
   const calculation = calculateArea();
-  
-  const handleSave = () => {
+
+  const handleSave = async () => {
     if (!roomName || !width || !height) {
       return;
     }
-    
-    const newMeasurement = {
-      id: Date.now().toString(),
-      room: roomName,
-      width,
-      height,
-      length: length || "",
-      unit,
+
+    const w = parseFloat(width) || 0;
+    const h = parseFloat(height) || 0;
+    const l = parseFloat(length) || 0;
+
+    // Convert to meters
+    let wM = w;
+    let hM = h;
+    let lM = l;
+
+    if (unit === "cm") {
+      wM = w / 100;
+      hM = h / 100;
+      lM = l / 100;
+    } else if (unit === "mm") {
+      wM = w / 1000;
+      hM = h / 1000;
+      lM = l / 1000;
+    }
+
+    const area = wM * hM;
+    const volume = wM * hM * lM;
+
+    const measurementData = {
+      project_name: roomName,
+      project_type: "measurement",
+      room_name: roomName,
+      measurements: {
+        width: wM,
+        height: hM,
+        length: lM,
+        unit,
+        area,
+        volume,
+        area_ft2: area * 10.764,
+        volume_ft3: volume * 35.314,
+      },
+      notes: `Unit: ${unit}, Area: ${area.toFixed(2)} m², Volume: ${volume.toFixed(3)} m³`
     };
-    
-    setSavedMeasurements([...savedMeasurements, newMeasurement]);
-    
-    // Clear form
-    setRoomName("");
-    setWidth("");
-    setHeight("");
-    setLength("");
-    alert("تم حفظ القياسات!");
+
+    try {
+      await createMeasurement(measurementData);
+      alert("تم حفظ القياسات!");
+      // Reload measurements
+      await loadMeasurements();
+      // Clear form
+      setRoomName("");
+      setWidth("");
+      setHeight("");
+      setLength("");
+    } catch (error) {
+      console.error("Error saving measurement:", error);
+      alert("فشل الحفظ، يرجى المحاولة مرة أخرى");
+    }
   };
 
-  const handleDelete = (id: string) => {
-    setSavedMeasurements(savedMeasurements.filter((m) => m.id !== id));
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteMeasurement(id);
+      await loadMeasurements();
+    } catch (error) {
+      console.error("Error deleting measurement:", error);
+      alert("فشل الحذف، يرجى المحاولة مرة أخرى");
+    }
   };
 
   return (
@@ -255,45 +334,59 @@ export default function MeasurementHelper() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                {savedMeasurements.map((measurement) => (
-                  <div
-                    key={measurement.id}
-                    className="flex items-center justify-between bg-gray-50 p-4 rounded-lg"
-                  >
-                    <div className="flex-1">
-                      <div className="font-semibold text-gray-900">{measurement.room}</div>
-                      <div className="text-sm text-gray-600">
-                        العرض: {measurement.width} {measurement.unit} |
-                        الارتفاع: {measurement.height} {measurement.unit}
-                        {measurement.length && `| الطول: ${measurement.length} ${measurement.unit}`}
+              {loading ? (
+                <div className="text-center py-8 text-gray-500">
+                  جاري التحميل...
+                </div>
+              ) : savedMeasurements.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">
+                  لا توجد قياسات محفوظة
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {savedMeasurements.map((measurement) => (
+                    <div
+                      key={measurement.id}
+                      className="flex items-center justify-between bg-gray-50 p-4 rounded-lg"
+                    >
+                      <div className="flex-1">
+                        <div className="font-semibold text-gray-900">{measurement.project_name}</div>
+                        <div className="text-sm text-gray-600">
+                          {measurement.measurements.area?.toFixed(2)} م²
+                          {measurement.measurements.volume > 0 && ` | ${measurement.measurements.volume?.toFixed(3)} م³`}
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            if (measurement.measurements) {
+                              const unit = measurement.measurements.unit as any;
+                              setWidth(measurement.measurements.width.toString());
+                              setHeight(measurement.measurements.height.toString());
+                              if (measurement.measurements.length) {
+                                setLength(measurement.measurements.length.toString());
+                              }
+                              setUnit(unit);
+                            }
+                          }}
+                        >
+                          <Calculator className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDelete(measurement.id)}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
                       </div>
                     </div>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          setWidth(measurement.width);
-                          setHeight(measurement.height);
-                          if (measurement.length) setLength(measurement.length);
-                          setUnit(measurement.unit as any);
-                        }}
-                      >
-                        <Calculator className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDelete(measurement.id)}
-                        className="text-red-600 hover:text-red-700"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         )}

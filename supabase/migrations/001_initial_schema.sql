@@ -2,6 +2,7 @@
 -- PostgreSQL Schema for Supabase
 -- Version: 1.0
 -- Date: February 3, 2026
+-- Carpenters application management system
 
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
