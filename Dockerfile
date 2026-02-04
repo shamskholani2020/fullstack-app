@@ -13,25 +13,47 @@ RUN npm ci
 FROM node:20-alpine AS builder
 WORKDIR /app
 
+# Build arguments (can be passed from Dokploy or CLI)
+ARG NEXT_PUBLIC_SUPABASE_URL
+ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
+ARG NEXT_PUBLIC_SUPABASE_PROJECT_REF
+
 # Copy dependencies from deps stage
 COPY --from=deps /app/node_modules ./node_modules
 
-# Copy all files including .env.local
+# Copy all files (including .env.local from repo)
 COPY . .
 
-# Set environment variables for build
+# Create .env.local from build arguments if provided
+RUN echo "NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL:-}" > .env.local
+RUN echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY:-}" >> .env.local
+RUN echo "NEXT_PUBLIC_SUPABASE_PROJECT_REF=${NEXT_PUBLIC_SUPABASE_PROJECT_REF:-bader}" >> .env.local
+
+# Show what's in .env.local (sanitized)
+RUN echo ".env.local created with values:"
+RUN cat .env.local | sed 's/=.*/=***/'
+
+# Set environment variables
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 
-# Build the application with better error output
-RUN npm run build || (echo "BUILD FAILED - Checking for errors..." && exit 1)
+# Build the application
+RUN npm run build
 
 # Stage 3: Runner
 FROM node:20-alpine AS runner
 WORKDIR /app
 
+# Runtime environment variables (can be passed from Dokploy)
+ARG NEXT_PUBLIC_SUPABASE_URL
+ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
+ARG NEXT_PUBLIC_SUPABASE_PROJECT_REF
+
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+ENV NEXT_PUBLIC_SUPABASE_PROJECT_REF=${NEXT_PUBLIC_SUPABASE_PROJECT_REF:-bader}
 
 # Create non-root user
 RUN addgroup --system --gid 1001 nodejs

@@ -1,0 +1,5 @@
+  // Status counts
+  const statusCounts = jobs.reduce((acc: Record<JobStatus, number>, job: Job) => {
+    acc[job.status] = (acc[job.status] || 0) + 1;
+    return acc;
+  }, {} as Record<JobStatus, number>);
