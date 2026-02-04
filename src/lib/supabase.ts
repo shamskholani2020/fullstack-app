@@ -88,7 +88,7 @@ export interface Checklist {
   id: string;
   user_id?: string;
   job_id?: string;
-  checklist_data: Json;
+  checklist_data: any; // Changed from Json to any for checklist items
   completed_at?: string;
   created_at: string;
 }

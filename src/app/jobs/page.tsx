@@ -19,26 +19,15 @@ import {
   Edit,
   ArrowLeft
 } from 'lucide-react';
+import {
+  getJobs,
+  createJob,
+  updateJob,
+  deleteJob as deleteJobFromDB
+} from '@/lib/supabase';
+import type { Job } from '@/lib/supabase';
 
 type JobStatus = 'inquiry' | 'measuring' | 'quoting' | 'in_progress' | 'finished' | 'paid';
-
-interface Job {
-  id: string;
-  clientName: string;
-  clientPhone: string;
-  address: string;
-  status: JobStatus;
-  projectType: string;
-  notes?: string;
-  photos?: {
-    before?: string[];
-    during?: string[];
-    after?: string[];
-  };
-  measurements?: string;
-  createdAt: string;
-  updatedAt: string;
-}
 
 const statusLabels: Record<JobStatus, { ar: string; en: string; color: string }> = {
   inquiry: { ar: 'استفسار', en: 'Inquiry', color: 'bg-gray-200 text-gray-800' },
@@ -49,104 +38,134 @@ const statusLabels: Record<JobStatus, { ar: string; en: string; color: string }>
   paid: { ar: 'مدفوع', en: 'Paid', color: 'bg-emerald-200 text-emerald-800' },
 };
 
-const projectTypes = [
-  'باب (Door)',
-  'نافذة (Window)',
-  'خزانة (Cabinet)',
-  'دولاب (Wardrobe)',
-  'مطبخ (Kitchen)',
-  'أثاث (Furniture)',
-  'أخرى (Other)',
-];
-
 export default function JobsPage() {
   const [view, setView] = useState<'list' | 'create' | 'edit'>('list');
   const [jobs, setJobs] = useState<Job[]>([]);
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<JobStatus | 'all'>('all');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // New/Edit Job Form State
   const [formData, setFormData] = useState({
     clientName: '',
     clientPhone: '',
-    address: '',
+    clientAddress: '',
     status: 'inquiry' as JobStatus,
-    projectType: 'باب (Door)',
     notes: '',
-    measurements: '',
+    measurements: undefined as any,
   });
 
-  // Load jobs from localStorage
+  // Load jobs from Supabase on mount
   useEffect(() => {
-    const savedJobs = localStorage.getItem('bader-jobs');
-    if (savedJobs) {
-      setJobs(JSON.parse(savedJobs));
-    }
+    loadJobs();
   }, []);
 
-  // Save jobs to localStorage
-  const saveJobs = (newJobs: Job[]) => {
-    localStorage.setItem('bader-jobs', JSON.stringify(newJobs));
-    setJobs(newJobs);
-  };
+  // Reload when search/status changes (for filtering)
+  useEffect(() => {
+    loadJobs();
+  }, [searchQuery, filterStatus]);
 
-  const handleCreateJob = () => {
-    if (!formData.clientName || !formData.clientPhone || !formData.address) {
+  async function loadJobs() {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await getJobs();
+      if (data) {
+        setJobs(data);
+      }
+    } catch (err) {
+      console.error('Error loading jobs:', err);
+      setError('فشل تحميل الوظائف');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const handleCreateJob = async () => {
+    if (!formData.clientName || !formData.clientPhone || !formData.clientAddress) {
       alert('يرجى ملء جميع الحقول المطلوبة (Please fill all required fields)');
       return;
     }
 
-    const newJob: Job = {
-      id: `job-${Date.now()}`,
-      ...formData,
-      photos: {
-        before: [],
-        during: [],
-        after: [],
-      },
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
+    try {
+      setLoading(true);
+      setError(null);
 
-    saveJobs([...jobs, newJob]);
-    resetForm();
-    setView('list');
-    alert('تم إنشاء بطاقة الوظيفة بنجاح (Job card created successfully)');
+      const newJob = {
+        client_name: formData.clientName,
+        client_phone: formData.clientPhone,
+        client_address: formData.clientAddress,
+        status: formData.status,
+        notes: formData.notes || undefined,
+        measurements: formData.measurements ? JSON.stringify(formData.measurements) : undefined,
+      };
+
+      await createJob(newJob);
+      alert('تم إنشاء بطاقة الوظيفة بنجاح (Job card created successfully)');
+      resetForm();
+      setView('list');
+      await loadJobs();
+    } catch (err) {
+      console.error('Error creating job:', err);
+      setError('فشل إنشاء الوظيفة');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleUpdateJob = () => {
+  const handleUpdateJob = async () => {
     if (!selectedJob) return;
 
-    const updatedJobs = jobs.map((job) =>
-      job.id === selectedJob.id
-        ? { ...job, ...formData, updatedAt: new Date().toISOString() }
-        : job
-    );
+    try {
+      setLoading(true);
+      setError(null);
 
-    saveJobs(updatedJobs);
-    resetForm();
-    setView('list');
-    setSelectedJob(null);
-    alert('تم تحديث بطاقة الوظيفة بنجاح (Job card updated successfully)');
+      const updates = {
+        client_name: formData.clientName,
+        client_phone: formData.clientPhone,
+        client_address: formData.clientAddress,
+        status: formData.status,
+        notes: formData.notes || undefined,
+        measurements: formData.measurements ? JSON.stringify(formData.measurements) : undefined,
+      };
+
+      await updateJob(selectedJob.id, updates);
+      alert('تم تحديث بطاقة الوظيفة بنجاح (Job card updated successfully)');
+      resetForm();
+      setView('list');
+      await loadJobs();
+    } catch (err) {
+      console.error('Error updating job:', err);
+      setError('فشل تحديث الوظيفة');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleDeleteJob = (jobId: string) => {
+  const handleDeleteJob = async (jobId: string) => {
     if (confirm('هل أنت متأكد من حذف هذه الوظيفة؟ (Are you sure you want to delete this job?)')) {
-      saveJobs(jobs.filter((job) => job.id !== jobId));
+      try {
+        setError(null);
+        await deleteJobFromDB(jobId);
+        await loadJobs();
+      } catch (err) {
+        console.error('Error deleting job:', err);
+        setError('فشل حذف الوظيفة');
+      }
     }
   };
 
   const handleEditJob = (job: Job) => {
     setSelectedJob(job);
     setFormData({
-      clientName: job.clientName,
-      clientPhone: job.clientPhone,
-      address: job.address,
-      status: job.status,
-      projectType: job.projectType,
+      clientName: job.client_name,
+      clientPhone: job.client_phone,
+      clientAddress: job.client_address || '',
+      status: job.status as JobStatus,
       notes: job.notes || '',
-      measurements: job.measurements || '',
+      measurements: job.measurements ? JSON.parse(job.measurements as string) : undefined,
     });
     setView('edit');
   };
@@ -155,45 +174,20 @@ export default function JobsPage() {
     setFormData({
       clientName: '',
       clientPhone: '',
-      address: '',
+      clientAddress: '',
       status: 'inquiry',
-      projectType: 'باب (Door)',
       notes: '',
-      measurements: '',
+      measurements: undefined,
     });
     setSelectedJob(null);
   };
 
-  const addPhoto = (type: 'before' | 'during' | 'after') => {
-    // Simulate photo upload
-    const photoUrl = `${type}-${Date.now()}.jpg`;
-
-    if (selectedJob) {
-      const updatedJobs = jobs.map((job) =>
-        job.id === selectedJob.id
-          ? {
-              ...job,
-              photos: {
-                ...job.photos,
-                [type]: [...(job.photos?.[type] || []), photoUrl],
-              },
-              updatedAt: new Date().toISOString(),
-            }
-          : job
-      );
-      saveJobs(updatedJobs);
-      setSelectedJob(updatedJobs.find((j) => j.id === selectedJob.id)!);
-      alert('تم إضافة الصورة (Photo added)');
-    }
-  };
-
-  // Filter jobs
+  // Filter jobs client-side
   const filteredJobs = jobs.filter((job) => {
     const matchesSearch =
-      job.clientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      job.clientPhone.includes(searchQuery) ||
-      job.address.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      job.projectType.toLowerCase().includes(searchQuery.toLowerCase());
+      job.client_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      job.client_phone.includes(searchQuery) ||
+      (job.client_address && job.client_address.toLowerCase().includes(searchQuery.toLowerCase()));
 
     const matchesStatus = filterStatus === 'all' || job.status === filterStatus;
 
@@ -201,8 +195,9 @@ export default function JobsPage() {
   });
 
   // Status counts
-  const statusCounts = jobs.reduce((acc, job) => {
-    acc[job.status] = (acc[job.status] || 0) + 1;
+  const statusCounts: Record<JobStatus, number> = jobs.reduce((acc: Record<JobStatus, number>, job: Job) => {
+    const status = job.status as JobStatus;
+    acc[status] = (acc[status] || 0) + 1;
     return acc;
   }, {} as Record<JobStatus, number>);
 
@@ -218,6 +213,12 @@ export default function JobsPage() {
             <span className="text-sm">Manage your projects and track their status</span>
           </p>
         </div>
+
+        {error && (
+          <div className="bg-red-50 border-2 border-red-200 text-red-600 p-4 rounded-xl mb-6 text-center">
+            {error}
+          </div>
+        )}
 
         {/* List View */}
         {view === 'list' && (
@@ -247,17 +248,15 @@ export default function JobsPage() {
 
             {/* Search and Filter */}
             <div className="bg-white rounded-xl p-4 mb-6 shadow-lg">
-              <div className="flex gap-2 mb-3">
-                <div className="relative flex-1">
-                  <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-                  <input
-                    type="text"
-                    placeholder="بحث... (Search)"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pr-10 pl-4 py-2 border-2 border-gray-200 rounded-lg focus:border-green-500 focus:outline-none text-right"
-                  />
-                </div>
+              <div className="relative mb-3">
+                <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                <input
+                  type="text"
+                  placeholder="بحث باسم العميل، الهاتف، العنوان... (Search by client name, phone, address...)"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pr-10 pl-4 py-2 border-2 border-gray-200 rounded-lg focus:border-green-500 focus:outline-none text-right"
+                />
               </div>
               <div className="flex flex-wrap gap-2">
                 <button
@@ -287,7 +286,12 @@ export default function JobsPage() {
             </div>
 
             {/* Job Cards */}
-            {filteredJobs.length === 0 ? (
+            {loading ? (
+              <div className="bg-white rounded-xl p-8 text-center text-gray-500">
+                <div className="inline-block w-8 h-8 border-4 border-green-600 border-t-transparent rounded-full animate-spin mb-4" />
+                <p>جاري التحميل...</p>
+              </div>
+            ) : filteredJobs.length === 0 ? (
               <div className="bg-white rounded-xl p-8 text-center text-gray-500">
                 <FileText size={48} className="mx-auto mb-4 text-gray-300" />
                 <p>لا توجد وظائف</p>
@@ -303,54 +307,38 @@ export default function JobsPage() {
                   >
                     <div className="flex items-start justify-between mb-3">
                       <div>
-                        <h3 className="text-lg font-bold text-gray-900">{job.clientName}</h3>
+                        <h3 className="text-lg font-bold text-gray-900 mb-1">{job.client_name}</h3>
                         <div className="flex items-center gap-2 text-gray-600 text-sm mt-1">
                           <Phone size={14} />
-                          <span>{job.clientPhone}</span>
+                          <span>{job.client_phone}</span>
                         </div>
                         <div className="flex items-center gap-2 text-gray-600 text-sm mt-1">
                           <MapPin size={14} />
-                          <span>{job.address}</span>
+                          <span>{job.client_address}</span>
                         </div>
                       </div>
-                      <span className={`px-3 py-1 rounded-full text-xs font-bold ${statusLabels[job.status].color}`}>
-                        {statusLabels[job.status].ar}
+                      <span className={`px-3 py-1 rounded-full text-xs font-bold ${statusLabels[job.status as JobStatus].color}`}>
+                        {statusLabels[job.status as JobStatus].ar}
                       </span>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4 mb-3 text-sm">
-                      <div>
-                        <p className="text-gray-500">نوع المشروع (Project Type)</p>
-                        <p className="font-semibold text-gray-900">{job.projectType}</p>
-                      </div>
+                    <div className="grid grid-cols-1 gap-4 mb-3 text-sm">
                       <div>
                         <p className="text-gray-500">تاريخ الإنشاء (Created)</p>
                         <p className="font-semibold text-gray-900">
-                          {new Date(job.createdAt).toLocaleDateString('ar-SY')}
+                          {new Date(job.created_at).toLocaleDateString('ar-SY')}
                         </p>
                       </div>
                     </div>
 
-                    {job.photos && (job.photos.before?.length || job.photos.during?.length || job.photos.after?.length) && (
+                    {job.photos && (job.photos.length || 0) > 0 && (
                       <div className="flex items-center gap-2 text-sm text-green-600 mb-3">
                         <Camera size={16} />
-                        <span>
-                          {(job.photos.before?.length || 0) + (job.photos.during?.length || 0) + (job.photos.after?.length || 0)} صور
-                        </span>
+                        <span>{job.photos.length} صور</span>
                       </div>
                     )}
 
                     <div className="flex gap-2">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleEditJob(job);
-                        }}
-                        className="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2 text-sm"
-                      >
-                        <Edit size={16} />
-                        <span>تعديل (Edit)</span>
-                      </button>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
@@ -372,7 +360,7 @@ export default function JobsPage() {
                 resetForm();
                 setView('create');
               }}
-              className="fixed bottom-24 left-4 right-4 md:left-auto md:right-6 md:w-auto bg-green-600 text-white py-4 px-8 rounded-2xl shadow-lg hover:bg-green-700 transition-all hover:shadow-xl flex items-center justify-center gap-2 font-bold text-lg z-50"
+              className="fixed bottom-24 left-4 right-4 md:left-auto md:right-6 bg-green-600 text-white py-4 px-8 rounded-2xl shadow-lg hover:bg-green-700 transition-all hover:shadow-xl flex items-center justify-center gap-2 font-bold text-lg z-50"
             >
               <Plus size={24} />
               <span>وظيفة جديدة (New Job)</span>
@@ -384,7 +372,10 @@ export default function JobsPage() {
         {(view === 'create' || view === 'edit') && (
           <div className="space-y-4">
             <button
-              onClick={() => setView('list')}
+              onClick={() => {
+                setView('list');
+                setSelectedJob(null);
+              }}
               className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4"
             >
               <ArrowLeft size={20} />
@@ -440,32 +431,11 @@ export default function JobsPage() {
                     <MapPin className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
                     <input
                       type="text"
-                      value={formData.address}
-                      onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                      value={formData.clientAddress}
+                      onChange={(e) => setFormData({ ...formData, clientAddress: e.target.value })}
                       className="w-full pr-10 pl-4 py-3 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none text-right"
                       placeholder="أدخل العنوان"
                     />
-                  </div>
-                </div>
-
-                {/* Project Type */}
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    نوع المشروع (Project Type)
-                  </label>
-                  <div className="relative">
-                    <ChevronDown className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={20} />
-                    <select
-                      value={formData.projectType}
-                      onChange={(e) => setFormData({ ...formData, projectType: e.target.value })}
-                      className="w-full pr-4 pl-10 py-3 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none text-right appearance-none bg-white"
-                    >
-                      {projectTypes.map((type) => (
-                        <option key={type} value={type}>
-                          {type}
-                        </option>
-                      ))}
-                    </select>
                   </div>
                 </div>
 
@@ -498,11 +468,17 @@ export default function JobsPage() {
                     القياسات (Measurements)
                   </label>
                   <textarea
-                    value={formData.measurements}
-                    onChange={(e) => setFormData({ ...formData, measurements: e.target.value })}
-                    className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none text-right"
+                    value={formData.measurements ? JSON.stringify(formData.measurements, null, 2) : ''}
+                    onChange={(e) => {
+                      try {
+                        setFormData({ ...formData, measurements: e.target.value ? JSON.parse(e.target.value) : undefined });
+                      } catch (err) {
+                        // Invalid JSON, ignore
+                      }
+                    }}
+                    className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none text-right font-mono text-sm"
                     rows={3}
-                    placeholder="أدخل تفاصيل القياسات..."
+                    placeholder='{"width": 2.4, "height": 2.0, "unit": "m"}'
                   />
                 </div>
 
@@ -529,10 +505,18 @@ export default function JobsPage() {
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-gray-600">
-                          قبل (Before): {selectedJob.photos.before?.length || 0}
+                          قبل (Before): {selectedJob.photos?.before?.length || 0}
                         </span>
                         <button
-                          onClick={() => addPhoto('before')}
+                          onClick={() => {
+                            alert('سيتم إضافة صورة (Photo will be added)');
+                          // TODO: Implement photo upload
+                          if (selectedJob) {
+                            const updatedPhotos = selectedJob.photos || {};
+                            updatedPhotos.before = [...(updatedPhotos.before || []), 'photo-simulated.jpg'];
+                            setSelectedJob({ ...selectedJob, photos: updatedPhotos });
+                          }
+                        }}
                           className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition-colors flex items-center gap-2"
                         >
                           <Camera size={16} />
@@ -541,10 +525,10 @@ export default function JobsPage() {
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-gray-600">
-                          أثناء (During): {selectedJob.photos.during?.length || 0}
+                          أثناء (During): {selectedJob.photos?.during?.length || 0}
                         </span>
                         <button
-                          onClick={() => addPhoto('during')}
+                          onClick={() => alert('سيتم إضافة صورة (Photo will be added)')}
                           className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition-colors flex items-center gap-2"
                         >
                           <Camera size={16} />
@@ -553,10 +537,10 @@ export default function JobsPage() {
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-gray-600">
-                          بعد (After): {selectedJob.photos.after?.length || 0}
+                          بعد (After): {selectedJob.photos?.after?.length || 0}
                         </span>
                         <button
-                          onClick={() => addPhoto('after')}
+                          onClick={() => alert('سيتم إضافة صورة (Photo will be added)')}
                           className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition-colors flex items-center gap-2"
                         >
                           <Camera size={16} />
@@ -570,10 +554,20 @@ export default function JobsPage() {
                 {/* Submit Button */}
                 <button
                   onClick={view === 'create' ? handleCreateJob : handleUpdateJob}
+                  disabled={loading}
                   className="w-full bg-green-600 text-white py-4 rounded-xl shadow-lg hover:bg-green-700 transition-all hover:shadow-xl flex items-center justify-center gap-2 font-bold text-lg mt-6"
                 >
-                  <Save size={24} />
-                  <span>{view === 'create' ? 'إنشاء (Create)' : 'حفظ التعديلات (Save Changes)'}</span>
+                  {loading ? (
+                    <>
+                      <div className="inline-block w-5 h-5 border-4 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>جاري الحفظ...</span>
+                    </>
+                  ) : (
+                    <>
+                      {view === 'create' ? <Plus size={24} /> : <Edit size={24} />}
+                      <span>{view === 'create' ? 'إنشاء (Create)' : 'حفظ التعديلات (Save Changes)'}</span>
+                    </>
+                  )}
                 </button>
               </div>
             </div>

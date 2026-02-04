@@ -14,26 +14,16 @@ import {
   TrendingDown,
   X
 } from 'lucide-react';
+import {
+  getProducts,
+  createProduct,
+  updateProduct,
+  deleteProduct as deleteProductFromDB
+} from '@/lib/supabase';
+import type { Product } from '@/lib/supabase';
 
 type Currency = 'USD' | 'SYP';
 type ProductCategory = 'mdf' | 'wood' | 'glue' | 'accessories' | 'custom_wood' | 'other';
-
-interface Product {
-  id: string;
-  name: string;
-  nameAr: string;
-  category: ProductCategory;
-  priceUSD: number;
-  priceSYP: number;
-  stock: number;
-  unit: string;
-  dimensions?: string;
-  description?: string;
-  supplier?: string;
-  imageUrl?: string;
-  createdAt: string;
-  updatedAt: string;
-}
 
 const categoryLabels: Record<ProductCategory, { ar: string; en: string; icon: string }> = {
   mdf: { ar: 'MDF', en: 'MDF', icon: '📦' },
@@ -57,6 +47,8 @@ export default function ProductsPage() {
   const [filterCategory, setFilterCategory] = useState<ProductCategory | 'all'>('all');
   const [currency, setCurrency] = useState<Currency>('SYP');
   const [showAddForm, setShowAddForm] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // New/Edit Product Form State
   const [formData, setFormData] = useState({
@@ -73,98 +65,119 @@ export default function ProductsPage() {
     imageUrl: '',
   });
 
-  // Load products from localStorage
+  // Load products from Supabase on mount
   useEffect(() => {
-    const savedProducts = localStorage.getItem('bader-products');
-    if (savedProducts) {
-      setProducts(JSON.parse(savedProducts));
-    }
+    loadProducts();
   }, []);
 
-  // Save products to localStorage
-  const saveProducts = (newProducts: Product[]) => {
-    localStorage.setItem('bader-products', JSON.stringify(newProducts));
-    setProducts(newProducts);
-  };
+  // Reload when search/category changes (for filtering)
+  useEffect(() => {
+    loadProducts();
+  }, [searchQuery, filterCategory]);
 
-  const handleCreateProduct = () => {
+  async function loadProducts() {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await getProducts();
+      if (data) {
+        setProducts(data);
+      }
+    } catch (err) {
+      console.error('Error loading products:', err);
+      setError('فشل تحميل المنتجات');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const handleCreateProduct = async () => {
     if (!formData.name || !formData.nameAr || formData.priceUSD <= 0) {
       alert('يرجى ملء جميع الحقول المطلوبة (Please fill all required fields)');
       return;
     }
 
-    // Calculate SYP price if not provided
-    const priceSYP = formData.priceSYP > 0 ? formData.priceSYP : formData.priceUSD * EXCHANGE_RATE;
+    try {
+      setLoading(true);
+      setError(null);
 
-    const newProduct: Product = {
-      id: `product-${Date.now()}`,
-      name: formData.name,
-      nameAr: formData.nameAr,
-      category: formData.category,
-      priceUSD: formData.priceUSD,
-      priceSYP,
-      stock: formData.stock,
-      unit: formData.unit,
-      dimensions: formData.dimensions || undefined,
-      description: formData.description || undefined,
-      supplier: formData.supplier || undefined,
-      imageUrl: formData.imageUrl || undefined,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
+      // Calculate SYP price if not provided
+      const priceSYP = formData.priceSYP > 0 ? formData.priceSYP : formData.priceUSD * EXCHANGE_RATE;
 
-    saveProducts([...products, newProduct]);
-    resetForm();
-    setShowAddForm(false);
-    alert('تم إضافة المنتج بنجاح (Product added successfully)');
-  };
+      const newProduct = {
+        name_ar: formData.nameAr,
+        name_en: formData.name,
+        category: formData.category,
+        price_usd: formData.priceUSD,
+        stock: formData.stock,
+        unit: formData.unit,
+        dimensions: formData.dimensions || undefined,
+        description: formData.description || undefined,
+        supplier_name: formData.supplier || undefined,
+        brand: undefined,
+        specifications: undefined,
+        images: formData.imageUrl ? [formData.imageUrl] : undefined,
+      };
 
-  const handleUpdateProduct = () => {
-    if (!selectedProduct) return;
-
-    // Calculate SYP price if not provided
-    const priceSYP = formData.priceSYP > 0 ? formData.priceSYP : formData.priceUSD * EXCHANGE_RATE;
-
-    const updatedProducts = products.map((product) =>
-      product.id === selectedProduct.id
-        ? {
-            ...product,
-            ...formData,
-            priceSYP,
-            updatedAt: new Date().toISOString(),
-          }
-        : product
-    );
-
-    saveProducts(updatedProducts);
-    resetForm();
-    setView('list');
-    setSelectedProduct(null);
-    alert('تم تحديث المنتج بنجاح (Product updated successfully)');
-  };
-
-  const handleDeleteProduct = (productId: string) => {
-    if (confirm('هل أنت متأكد من حذف هذا المنتج؟ (Are you sure you want to delete this product?)')) {
-      saveProducts(products.filter((product) => product.id !== productId));
+      await createProduct(newProduct);
+      alert('تم إضافة المنتج بنجاح (Product added successfully)');
+      resetForm();
+      setShowAddForm(false);
+      await loadProducts();
+    } catch (err) {
+      console.error('Error creating product:', err);
+      setError('فشل إضافة المنتج');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleEditProduct = (product: Product) => {
-    setSelectedProduct(product);
-    setFormData({
-      name: product.name,
-      nameAr: product.nameAr,
-      category: product.category,
-      priceUSD: product.priceUSD,
-      priceSYP: product.priceSYP,
-      stock: product.stock,
-      unit: product.unit,
-      dimensions: product.dimensions || '',
-      description: product.description || '',
-      supplier: product.supplier || '',
-      imageUrl: product.imageUrl || '',
-    });
-    setView('edit');
+  const handleUpdateProduct = async () => {
+    if (!selectedProduct) return;
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      const priceSYP = formData.priceSYP > 0 ? formData.priceSYP : formData.priceUSD * EXCHANGE_RATE;
+
+      const updates = {
+        name_ar: formData.nameAr,
+        name_en: formData.name,
+        category: formData.category,
+        price_usd: formData.priceUSD,
+        stock: formData.stock,
+        unit: formData.unit,
+        dimensions: formData.dimensions || undefined,
+        description: formData.description || undefined,
+        supplier_name: formData.supplier || undefined,
+        images: formData.imageUrl ? [formData.imageUrl] : undefined,
+      };
+
+      await updateProduct(selectedProduct.id, updates);
+      alert('تم تحديث المنتج بنجاح (Product updated successfully)');
+      resetForm();
+      setView('list');
+      await loadProducts();
+    } catch (err) {
+      console.error('Error updating product:', err);
+      setError('فشل تحديث المنتج');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteProduct = async (productId: string) => {
+    if (confirm('هل أنت متأكد من حذف هذا المنتج؟ (Are you sure you want to delete this product?)')) {
+      try {
+        setError(null);
+        await deleteProductFromDB(productId);
+        await loadProducts();
+      } catch (err) {
+        console.error('Error deleting product:', err);
+        setError('فشل حذف المنتج');
+      }
+    }
   };
 
   const resetForm = () => {
@@ -198,11 +211,11 @@ export default function ProductsPage() {
     return 'bg-green-200 text-green-800';
   };
 
-  // Filter products
+  // Filter products client-side
   const filteredProducts = products.filter((product) => {
     const matchesSearch =
-      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.nameAr.includes(searchQuery) ||
+      product.name_en?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.name_ar?.includes(searchQuery) ||
       (product.description && product.description.toLowerCase().includes(searchQuery.toLowerCase()));
 
     const matchesCategory = filterCategory === 'all' || product.category === filterCategory;
@@ -277,50 +290,62 @@ export default function ProductsPage() {
           )}
         </div>
 
-        {/* Search and Filter */}
-        <div className="bg-white rounded-xl p-4 mb-6 shadow-lg">
-          <div className="relative mb-3">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-            <input
-              type="text"
-              placeholder="بحث بالاسم أو الوصف... (Search by name or description)"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pr-10 pl-4 py-2 border-2 border-gray-200 rounded-lg focus:border-green-500 focus:outline-none text-right"
-            />
+        {error && (
+          <div className="bg-red-50 border-2 border-red-200 text-red-600 p-4 rounded-xl mb-6 text-center">
+            {error}
           </div>
-          <div className="flex flex-wrap gap-2">
-            <button
-              onClick={() => setFilterCategory('all')}
-              className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
-                filterCategory === 'all'
-                  ? 'bg-green-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              الكل (All) ({products.length})
-            </button>
-            {Object.entries(categoryLabels).map(([category, info]) => (
-              <button
-                key={category}
-                onClick={() => setFilterCategory(category as ProductCategory)}
-                className={`px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
-                  filterCategory === category
-                    ? 'bg-green-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                <span className="ml-1">{info.icon}</span>
-                {info.ar} ({categoryCounts[category as ProductCategory] || 0})
-              </button>
-            ))}
-          </div>
-        </div>
+        )}
 
         {/* List View */}
         {view === 'list' && (
           <>
-            {filteredProducts.length === 0 ? (
+            {/* Search and Filter */}
+            <div className="bg-white rounded-xl p-4 mb-6 shadow-lg">
+              <div className="relative mb-3">
+                <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                <input
+                  type="text"
+                  placeholder="بحث بالاسم أو الوصف... (Search by name or description)"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pr-10 pl-4 py-2 border-2 border-gray-200 rounded-lg focus:border-green-500 focus:outline-none text-right"
+                />
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => setFilterCategory('all')}
+                  className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                    filterCategory === 'all'
+                      ? 'bg-green-600 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  الكل (All) ({products.length})
+                </button>
+                {Object.entries(categoryLabels).map(([category, info]) => (
+                  <button
+                    key={category}
+                    onClick={() => setFilterCategory(category as ProductCategory)}
+                    className={`px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                      filterCategory === category
+                        ? 'bg-green-600 text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    <span className="ml-1">{info.icon}</span>
+                    {info.ar} ({categoryCounts[category as ProductCategory] || 0})
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Product List */}
+            {loading ? (
+              <div className="bg-white rounded-xl p-8 text-center text-gray-500">
+                <div className="inline-block w-8 h-8 border-4 border-green-600 border-t-transparent rounded-full animate-spin mb-4" />
+                <p>جاري التحميل...</p>
+              </div>
+            ) : filteredProducts.length === 0 ? (
               <div className="bg-white rounded-xl p-8 text-center text-gray-500">
                 <Package size={48} className="mx-auto mb-4 text-gray-300" />
                 <p>لا توجد منتجات</p>
@@ -350,14 +375,14 @@ export default function ProductsPage() {
                     </div>
 
                     {/* Product Name */}
-                    <h3 className="text-lg font-bold text-gray-900 mb-1">{product.nameAr}</h3>
-                    <p className="text-sm text-gray-600 mb-2">{product.name}</p>
+                    <h3 className="text-lg font-bold text-gray-900 mb-1">{product.name_ar}</h3>
+                    <p className="text-sm text-gray-600 mb-2">{product.name_en}</p>
 
                     {/* Price */}
                     <div className="flex items-center gap-2 mb-3">
                       <DollarSign size={18} className="text-green-600" />
                       <span className="text-xl font-bold text-green-700">
-                        {convertPrice(product.priceUSD, product.priceSYP)}
+                        {convertPrice(product.price_usd, parseFloat(product.price_usd.toString()) * EXCHANGE_RATE)}
                       </span>
                     </div>
 
@@ -369,17 +394,33 @@ export default function ProductsPage() {
                       </div>
                     )}
 
-                    {product.supplier && (
+                    {product.supplier_name && (
                       <div className="flex items-center gap-2 text-sm text-gray-600 mb-3">
                         <TrendingDown size={16} />
-                        <span>{product.supplier}</span>
+                        <span>{product.supplier_name}</span>
                       </div>
                     )}
 
                     {/* Actions */}
                     <div className="flex gap-2">
                       <button
-                        onClick={() => handleEditProduct(product)}
+                        onClick={() => {
+                          setSelectedProduct(product);
+                          setFormData({
+                            name: product.name_en || '',
+                            nameAr: product.name_ar,
+                            category: product.category,
+                            priceUSD: product.price_usd,
+                            priceSYP: parseFloat(product.price_usd.toString()) * EXCHANGE_RATE,
+                            stock: product.stock,
+                            unit: product.unit,
+                            dimensions: product.dimensions || '',
+                            description: product.description || '',
+                            supplier: product.supplier_name || '',
+                            imageUrl: product.images?.[0] || '',
+                          });
+                          setView('edit');
+                        }}
                         className="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2 text-sm"
                       >
                         <Edit size={16} />
@@ -399,7 +440,7 @@ export default function ProductsPage() {
           </>
         )}
 
-        {/* Add Product Form (Modal) */}
+        {/* Add Product Modal */}
         {showAddForm && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
             <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -491,6 +532,8 @@ export default function ProductsPage() {
                   {formData.priceUSD > 0 && (
                     <p className="text-sm text-gray-600 mt-1">
                       ≈ {(formData.priceUSD * EXCHANGE_RATE).toLocaleString('ar-SY')} ل.س (جديد)
+                      <br />
+                      ≈ {(formData.priceUSD * EXCHANGE_RATE).toLocaleString()} SYP (new)
                     </p>
                   )}
                 </div>
@@ -518,7 +561,7 @@ export default function ProductsPage() {
                   <select
                     value={formData.unit}
                     onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
-                    className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none bg-white"
+                    className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none"
                   >
                     {units.map((unit) => (
                       <option key={unit} value={unit}>
@@ -573,10 +616,20 @@ export default function ProductsPage() {
                 {/* Submit Button */}
                 <button
                   onClick={handleCreateProduct}
-                  className="w-full bg-green-600 text-white py-4 rounded-xl shadow-lg hover:bg-green-700 transition-all hover:shadow-xl flex items-center justify-center gap-2 font-bold text-lg mt-6"
+                  disabled={loading}
+                  className="w-full bg-green-600 text-white py-4 rounded-xl shadow-lg hover:bg-green-700 transition-all hover:shadow-xl flex items-center justify-center gap-2 font-bold text-lg"
                 >
-                  <Plus size={24} />
-                  <span>إضافة المنتج (Add Product)</span>
+                  {loading ? (
+                    <>
+                      <div className="inline-block w-5 h-5 border-4 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>جاري الحفظ...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Plus size={24} />
+                      <span>إضافة المنتج (Add Product)</span>
+                    </>
+                  )}
                 </button>
               </div>
             </div>
@@ -693,7 +746,7 @@ export default function ProductsPage() {
                   <select
                     value={formData.unit}
                     onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
-                    className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none bg-white"
+                    className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none"
                   >
                     {units.map((unit) => (
                       <option key={unit} value={unit}>
@@ -745,10 +798,20 @@ export default function ProductsPage() {
                 {/* Submit Button */}
                 <button
                   onClick={handleUpdateProduct}
-                  className="w-full bg-green-600 text-white py-4 rounded-xl shadow-lg hover:bg-green-700 transition-all hover:shadow-xl flex items-center justify-center gap-2 font-bold text-lg mt-6"
+                  disabled={loading}
+                  className="w-full bg-green-600 text-white py-4 rounded-xl shadow-lg hover:bg-green-700 transition-all hover:shadow-xl flex items-center justify-center gap-2 font-bold text-lg"
                 >
-                  <Edit size={24} />
-                  <span>حفظ التعديلات (Save Changes)</span>
+                  {loading ? (
+                    <>
+                      <div className="inline-block w-5 h-5 border-4 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>جاري الحفظ...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Edit size={24} />
+                      <span>حفظ التعديلات (Save Changes)</span>
+                    </>
+                  )}
                 </button>
               </div>
             </div>

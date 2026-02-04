@@ -2,6 +2,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { CheckCircle, Circle, Plus, Save, Trash2, Camera, FileText, ChevronRight } from 'lucide-react';
+import {
+  getChecklists,
+  createChecklist,
+  deleteChecklist as deleteChecklistFromDB
+} from '@/lib/supabase';
+import type { Checklist } from '@/lib/supabase';
 
 interface ChecklistItem {
   id: string;
@@ -17,123 +23,151 @@ interface ChecklistTemplate {
   items: Omit<ChecklistItem, 'id'>[];
 }
 
+const templates: ChecklistTemplate[] = [
+  {
+    id: 'door',
+    name: 'باب (Door)',
+    items: [
+      { text: 'قياس الباب (Door measurement)', checked: false },
+      { text: 'نوع الخشب (Wood type)', checked: false },
+      { text: 'أبعاد الباب (Dimensions)', checked: false },
+      { text: 'نوع المقبض (Handle type)', checked: false },
+      { text: 'البراغي والمسامير (Screws and nails)', checked: false },
+      { text: 'الورنيش (Varnish)', checked: false },
+      { text: 'الصوف (Foam/Weatherstrip)', checked: false },
+      { text: 'المقاطعة (Hinges)', checked: false },
+    ]
+  },
+  {
+    id: 'window',
+    name: 'نافذة (Window)',
+    items: [
+      { text: 'قياس النافذة (Window measurement)', checked: false },
+      { text: 'نوع الخشب (Wood type)', checked: false },
+      { text: 'الأبعاد (Dimensions)', checked: false },
+      { text: 'الزجاج (Glass)', checked: false },
+      { text: 'المفصلات (Hinges)', checked: false },
+      { text: 'البراغي (Screws)', checked: false },
+      { text: 'الورنيش (Varnish)', checked: false },
+      { text: 'المقاطع (Frames)', checked: false },
+    ]
+  },
+  {
+    id: 'cabinet',
+    name: 'خزانة (Cabinet)',
+    items: [
+      { text: 'قياس الخزانة (Cabinet measurement)', checked: false },
+      { text: 'نوع الخشب (Wood type - MDF/نحاس/شجرة)', checked: false },
+      { text: 'الأرفف (Shelves)', checked: false },
+      { text: 'الأبواب (Doors)', checked: false },
+      { text: 'البراغي والمسامير (Screws and nails)', checked: false },
+      { text: 'المفصلات (Hinges)', checked: false },
+      { text: 'الورنيش (Varnish)', checked: false },
+      { text: 'الملحقات (Accessories)', checked: false },
+    ]
+  },
+  {
+    id: 'wardrobe',
+    name: 'دولاب (Wardrobe)',
+    items: [
+      { text: 'قياس الدولاب (Wardrobe measurement)', checked: false },
+      { text: 'نوع الخشب (Wood type)', checked: false },
+      { text: 'الأبواب (Doors - عدد ونوع)', checked: false },
+      { text: 'الأدراج (Drawers)', checked: false },
+      { text: 'الرفوف (Shelves)', checked: false },
+      { text: 'البراغي والمسامير (Screws and nails)', checked: false },
+      { text: 'المفصلات (Hinges)', checked: false },
+      { text: 'الورنيش (Varnish)', checked: false },
+      { text: 'خطافات (Hooks)', checked: false },
+    ]
+  },
+  {
+    id: 'kitchen',
+    name: 'مطبخ (Kitchen)',
+    items: [
+      { text: 'قياس المطبخ (Kitchen measurement)', checked: false },
+      { text: 'نوع الخشب (Wood type)', checked: false },
+      { text: 'الخزائن (Cabinets)', checked: false },
+      { text: 'الأدراج (Drawers)', checked: false },
+      { text: 'الرفوف (Shelves)', checked: false },
+      { text: 'البراغي والمسامير (Screws and nails)', checked: false },
+      { text: 'المفصلات (Hinges)', checked: false },
+      { text: 'الورنيش (Varnish)', checked: false },
+      { text: 'الملحقات (Accessories)', checked: false },
+      { text: 'الحوض (Sink)', checked: false },
+      { text: 'الصنابير (Faucets)', checked: false },
+      { text: 'الخلفية (Backsplash)', checked: false },
+    ]
+  }
+];
+
 export default function ChecklistPage() {
   const [activeTab, setActiveTab] = useState<'templates' | 'custom'>('templates');
   const [selectedTemplate, setSelectedTemplate] = useState<ChecklistTemplate | null>(null);
   const [customItems, setCustomItems] = useState<ChecklistItem[]>([]);
   const [newItemText, setNewItemText] = useState('');
-  const [savedChecklists, setSavedChecklists] = useState<ChecklistItem[][]>([]);
+  const [savedChecklists, setSavedChecklists] = useState<Checklist[]>([]);
   const [expandedItem, setExpandedItem] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // Pre-built templates
-  const templates: ChecklistTemplate[] = [
-    {
-      id: 'door',
-      name: 'باب (Door)',
-      items: [
-        { text: 'قياس الباب (Door measurement)', checked: false },
-        { text: 'نوع الخشب (Wood type)', checked: false },
-        { text: 'أبعاد الباب (Dimensions)', checked: false },
-        { text: 'نوع المقبض (Handle type)', checked: false },
-        { text: 'البراغي والمسامير (Screws and nails)', checked: false },
-        { text: 'الورنيش (Varnish)', checked: false },
-        { text: 'الصوف (Foam/Weatherstrip)', checked: false },
-        { text: 'المقاطعة (Hinges)', checked: false },
-      ]
-    },
-    {
-      id: 'window',
-      name: 'نافذة (Window)',
-      items: [
-        { text: 'قياس النافذة (Window measurement)', checked: false },
-        { text: 'نوع الخشب (Wood type)', checked: false },
-        { text: 'الأبعاد (Dimensions)', checked: false },
-        { text: 'الزجاج (Glass)', checked: false },
-        { text: 'المفصلات (Hinges)', checked: false },
-        { text: 'البراغي (Screws)', checked: false },
-        { text: 'الورنيش (Varnish)', checked: false },
-        { text: 'المقاطع (Frames)', checked: false },
-      ]
-    },
-    {
-      id: 'cabinet',
-      name: 'خزانة (Cabinet)',
-      items: [
-        { text: 'قياس الخزانة (Cabinet measurement)', checked: false },
-        { text: 'نوع الخشب (Wood type - MDF/نحاس/شجرة)', checked: false },
-        { text: 'الأرفف (Shelves)', checked: false },
-        { text: 'الأبواب (Doors)', checked: false },
-        { text: 'البراغي والمسامير (Screws and nails)', checked: false },
-        { text: 'المفصلات (Hinges)', checked: false },
-        { text: 'الورنيش (Varnish)', checked: false },
-        { text: 'الملحقات (Accessories)', checked: false },
-      ]
-    },
-    {
-      id: 'wardrobe',
-      name: 'دولاب (Wardrobe)',
-      items: [
-        { text: 'قياس الدولاب (Wardrobe measurement)', checked: false },
-        { text: 'نوع الخشب (Wood type)', checked: false },
-        { text: 'الأبواب (Doors - عدد ونوع)', checked: false },
-        { text: 'الأدراج (Drawers)', checked: false },
-        { text: 'الرفوف (Shelves)', checked: false },
-        { text: 'البراغي والمسامير (Screws and nails)', checked: false },
-        { text: 'المفصلات (Hinges)', checked: false },
-        { text: 'الورنيش (Varnish)', checked: false },
-        { text: 'خطافات (Hooks)', checked: false },
-      ]
-    },
-    {
-      id: 'kitchen',
-      name: 'مطبخ (Kitchen)',
-      items: [
-        { text: 'قياس المطبخ (Kitchen measurement)', checked: false },
-        { text: 'نوع الخشب (Wood type)', checked: false },
-        { text: 'الخزائن (Cabinets)', checked: false },
-        { text: 'الأدراج (Drawers)', checked: false },
-        { text: 'الرفوف (Shelves)', checked: false },
-        { text: 'البراغي والمسامير (Screws and nails)', checked: false },
-        { text: 'المفصلات (Hinges)', checked: false },
-        { text: 'الورنيش (Varnish)', checked: false },
-        { text: 'الملحقات (Accessories)', checked: false },
-        { text: 'الحوض (Sink)', checked: false },
-      ]
-    }
-  ];
-
-  // Load saved checklists from localStorage
+  // Load checklists from Supabase on mount
   useEffect(() => {
-    const saved = localStorage.getItem('bader-saved-checklists');
-    if (saved) {
-      setSavedChecklists(JSON.parse(saved));
-    }
+    loadChecklists();
   }, []);
 
-  // Save checklists to localStorage
-  const saveChecklists = (checklists: ChecklistItem[][]) => {
-    localStorage.setItem('bader-saved-checklists', JSON.stringify(checklists));
-    setSavedChecklists(checklists);
-  };
+  async function loadChecklists() {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await getChecklists();
+      if (data) {
+        setSavedChecklists(data);
+      }
+    } catch (err) {
+      console.error('Error loading checklists:', err);
+      setError('فشل تحميل القوائم');
+    } finally {
+      setLoading(false);
+    }
+  }
 
-  const handleTemplateSelect = (template: ChecklistTemplate) => {
+  const handleTemplateSelect = async (template: ChecklistTemplate) => {
     const items: ChecklistItem[] = template.items.map((item, index) => ({
       ...item,
       id: `template-${template.id}-${index}`,
     }));
-    setCustomItems(items);
-    setSelectedTemplate(template);
-    setActiveTab('custom');
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      const newChecklist = {
+        checklist_data: items as any, // Cast to Json type
+        is_public: false,
+      };
+
+      await createChecklist(newChecklist as any);
+      setCustomItems(items);
+      setSelectedTemplate(template);
+      setActiveTab('custom');
+      alert('تم إنشاء القائمة من القالب (Checklist created from template)');
+      await loadChecklists();
+    } catch (err) {
+      console.error('Error creating checklist from template:', err);
+      setError('فشل إنشاء القائمة');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const addCustomItem = () => {
     if (newItemText.trim()) {
-      const newItem: ChecklistItem = {
+      setCustomItems([...customItems, {
         id: `custom-${Date.now()}`,
         text: newItemText,
         checked: false,
-      };
-      setCustomItems([...customItems, newItem]);
+      }]);
       setNewItemText('');
     }
   };
@@ -148,34 +182,56 @@ export default function ChecklistPage() {
     setCustomItems(customItems.filter(item => item.id !== id));
   };
 
-  const saveCurrentChecklist = () => {
+  const saveCurrentChecklist = async () => {
     if (customItems.length === 0) {
       alert('لا يوجد عناصر للحفظ (No items to save)');
       return;
     }
-    const newSaved = [...savedChecklists, [...customItems]];
-    saveChecklists(newSaved);
-    alert('تم حفظ القائمة بنجاح (Checklist saved successfully)');
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      const newChecklist = {
+        checklist_data: customItems as any, // Cast to any for Supabase Json type
+        is_public: false,
+      };
+
+      await createChecklist(newChecklist);
+      alert('تم حفظ القائمة بنجاح (Checklist saved successfully)');
+      await loadChecklists();
+    } catch (err) {
+      console.error('Error saving checklist:', err);
+      setError('فشل حفظ القائمة');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const loadSavedChecklist = (index: number) => {
-    setCustomItems(savedChecklists[index]);
+  const loadSavedChecklist = async (checklist: Checklist) => {
+    // Extract items from checklist_data (which is stored as Json)
+    const items = (checklist.checklist_data as any) as ChecklistItem[];
+    setCustomItems(items);
     setSelectedTemplate(null);
     setActiveTab('custom');
   };
 
-  const deleteSavedChecklist = (index: number) => {
+  const deleteSavedChecklist = async (checklistId: string) => {
     if (confirm('هل أنت متأكد من حذف هذه القائمة؟ (Are you sure you want to delete this checklist?)')) {
-      const newSaved = savedChecklists.filter((_, i) => i !== index);
-      saveChecklists(newSaved);
+      try {
+        setError(null);
+        await deleteChecklistFromDB(checklistId);
+        await loadChecklists();
+      } catch (err) {
+        console.error('Error deleting checklist:', err);
+        setError('فشل حذف القائمة');
+      }
     }
   };
 
   const addPhotoToItem = (itemId: string) => {
-    // Simulate photo upload (in real app, this would use camera/file picker)
-    const photoUrl = `photo-${itemId}-${Date.now()}.jpg`;
     setCustomItems(customItems.map(item =>
-      item.id === itemId ? { ...item, photo: photoUrl } : item
+      item.id === itemId ? { ...item, photo: `photo-${itemId}-${Date.now()}.jpg` } : item
     ));
     alert('تم إضافة الصورة (Photo added)');
   };
@@ -202,6 +258,12 @@ export default function ChecklistPage() {
             <span className="text-sm">Create checklists for your projects and track progress</span>
           </p>
         </div>
+
+        {error && (
+          <div className="bg-red-50 border-2 border-red-200 text-red-600 p-4 rounded-xl mb-6 text-center">
+            {error}
+          </div>
+        )}
 
         {/* Tab Buttons */}
         <div className="flex gap-2 mb-6">
@@ -256,35 +318,40 @@ export default function ChecklistPage() {
               <div className="mt-8">
                 <h2 className="text-xl font-bold text-gray-800 mb-4">القوائم المحفوظة (Saved Checklists)</h2>
                 <div className="space-y-3">
-                  {savedChecklists.map((checklist, index) => (
-                    <div
-                      key={index}
-                      className="bg-white rounded-xl p-4 flex items-center justify-between hover:shadow-lg transition-all"
-                    >
-                      <div>
-                        <p className="font-semibold text-gray-900">
-                          القائمة {index + 1} ({checklist.length} عناصر)
-                        </p>
-                        <p className="text-sm text-gray-600">
-                          {checklist.filter(item => item.checked).length} من {checklist.length} مكتمل
-                        </p>
+                  {savedChecklists.map((checklist) => {
+                    const items = checklist.checklist_data as ChecklistItem[];
+                    const completedCount = items.filter(i => i.checked).length;
+
+                    return (
+                      <div
+                        key={checklist.id}
+                        className="bg-white rounded-xl p-4 flex items-center justify-between hover:shadow-lg transition-all"
+                      >
+                        <div>
+                          <p className="font-semibold text-gray-900">
+                            القائمة {checklist.id.slice(0, 8)} ({items.length} عناصر)
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            {completedCount} من {items.length} مكتمل
+                          </p>
+                        </div>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => loadSavedChecklist(checklist)}
+                            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+                          >
+                            تحميل (Load)
+                          </button>
+                          <button
+                            onClick={() => deleteSavedChecklist(checklist.id)}
+                            className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors"
+                          >
+                            حذف (Delete)
+                          </button>
+                        </div>
                       </div>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => loadSavedChecklist(index)}
-                          className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
-                        >
-                          تحميل (Load)
-                        </button>
-                        <button
-                          onClick={() => deleteSavedChecklist(index)}
-                          className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
-                        >
-                          حذف (Delete)
-                        </button>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -332,7 +399,7 @@ export default function ChecklistPage() {
                 />
                 <button
                   onClick={addCustomItem}
-                  className="bg-green-600 text-white px-6 py-3 rounded-xl hover:bg-green-700 transition-colors flex items-center gap-2"
+                  className="bg-green-600 text-white px-6 py-3 rounded-xl hover:bg-green-700 transition-colors flex items-center gap-2 font-semibold"
                 >
                   <Plus size={20} />
                   <span className="hidden sm:inline">إضافة (Add)</span>
@@ -341,7 +408,12 @@ export default function ChecklistPage() {
             </div>
 
             {/* Checklist Items */}
-            {customItems.length === 0 ? (
+            {loading ? (
+              <div className="bg-white rounded-xl p-8 text-center text-gray-500">
+                <div className="inline-block w-8 h-8 border-4 border-green-600 border-t-transparent rounded-full animate-spin mb-4" />
+                <p>جاري التحميل...</p>
+              </div>
+            ) : customItems.length === 0 ? (
               <div className="bg-white rounded-xl p-8 text-center text-gray-500">
                 <FileText size={48} className="mx-auto mb-4 text-gray-300" />
                 <p>لا توجد عناصر في القائمة</p>
@@ -403,22 +475,20 @@ export default function ChecklistPage() {
                       </div>
 
                       {/* Action Buttons */}
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => setExpandedItem(expandedItem === item.id ? null : item.id)}
-                          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                          title="ملاحظات (Notes)"
-                        >
-                          <FileText size={20} className="text-gray-600" />
-                        </button>
-                        <button
-                          onClick={() => deleteItem(item.id)}
-                          className="p-2 hover:bg-red-50 rounded-lg transition-colors"
-                          title="حذف (Delete)"
-                        >
-                          <Trash2 size={20} className="text-red-600" />
-                        </button>
-                      </div>
+                      <button
+                        onClick={() => setExpandedItem(expandedItem === item.id ? null : item.id)}
+                        className="p-2 hover:bg-gray-100 rounded-lg"
+                        title="ملاحظات (Notes)"
+                      >
+                        <FileText size={20} className="text-gray-600" />
+                      </button>
+                      <button
+                        onClick={() => deleteItem(item.id)}
+                        className="p-2 hover:bg-red-50 rounded-lg"
+                        title="حذف (Delete)"
+                      >
+                        <Trash2 size={20} className="text-red-600" />
+                      </button>
                     </div>
                   </div>
                 ))}
@@ -430,10 +500,20 @@ export default function ChecklistPage() {
               <div className="sticky bottom-4">
                 <button
                   onClick={saveCurrentChecklist}
-                  className="w-full bg-green-600 text-white py-4 rounded-xl shadow-lg hover:bg-green-700 transition-all hover:shadow-xl flex items-center justify-center gap-2 font-semibold text-lg"
+                  disabled={loading}
+                  className="w-full bg-green-600 text-white py-4 rounded-xl shadow-lg hover:bg-green-700 transition-all hover:shadow-xl flex items-center justify-center gap-2 font-bold text-lg"
                 >
-                  <Save size={24} />
-                  <span>حفظ القائمة (Save Checklist)</span>
+                  {loading ? (
+                    <>
+                      <div className="inline-block w-5 h-5 border-4 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>جاري الحفظ...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Save size={24} />
+                      <span>حفظ القائمة (Save Checklist)</span>
+                    </>
+                  )}
                 </button>
               </div>
             )}
