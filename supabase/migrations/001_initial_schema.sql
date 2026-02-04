@@ -235,6 +235,7 @@ BEGIN
     NEW.updated_at = NOW();
     RETURN NEW;
 END;
+$$ LANGUAGE plpgsql;
 
 CREATE TRIGGER update_users_updated_at BEFORE UPDATE ON users
     FOR EACH ROW EXECUTE FUNCTION update_updated_at();
@@ -261,6 +262,7 @@ BEGIN
         0
     );
 END;
+$$ LANGUAGE plpgsql;
 
 -- Get user's unpaid invoices total
 CREATE OR REPLACE FUNCTION get_user_unpaid_total(user_id UUID)
@@ -276,6 +278,7 @@ BEGIN
         0
     );
 END;
+$$ LANGUAGE plpgsql;
 
 -- ============================================================================
 -- SEED DATA (Optional - for initial testing)
