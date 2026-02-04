@@ -82,10 +82,9 @@ export default function AuthScreen() {
                   <Input
                     type="tel"
                     placeholder="xxx xxxx xxx"
-                    className="text-lg text-right"
+                    className="text-lg text-right flex-1"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    className="flex-1"
                   />
                 </div>
                 <p className="text-sm text-gray-500 text-right">
@@ -119,11 +118,10 @@ export default function AuthScreen() {
                 <Input
                   type="text"
                   placeholder="xxxxxx"
-                  className="text-2xl text-center font-mono tracking-wider"
+                  className="text-2xl text-center font-mono tracking-wider w-full"
                   value={code}
                   onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
                   maxLength={6}
-                  className="w-full"
                 />
                 <p className="text-sm text-gray-500 text-right">
                   أدخل الكود المكون من 6 أرقام المرسل إلى {phone}

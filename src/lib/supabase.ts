@@ -330,5 +330,4 @@ export async function getLatestExchangeRate() {
 // ============================================================================
 // SUPABASE CLIENT
 // ============================================================================
-
-export { supabase };
+// Supabase client is exported at the top of the file
