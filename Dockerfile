@@ -24,13 +24,27 @@ COPY --from=deps /app/node_modules ./node_modules
 # Copy all files (including .env.local from repo)
 COPY . .
 
-# Create .env.local from build arguments if provided
-RUN echo "NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL:-}" > .env.local
-RUN echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY:-}" >> .env.local
-RUN echo "NEXT_PUBLIC_SUPABASE_PROJECT_REF=${NEXT_PUBLIC_SUPABASE_PROJECT_REF:-bader}" >> .env.local
+# Ensure .env.local exists with Supabase configuration
+RUN if [ ! -f .env.local ] || [ ! -s .env.local ]; then \
+      echo "Creating default .env.local..."; \
+      echo "NEXT_PUBLIC_SUPABASE_URL=https://supabase.kholani.store" > .env.local; \
+      echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3NzAxNTE5NzIsImV4cCI6MTg5MzQ1NjAwMCwicm9sZSI6ImFub24iLCJpc3MiOiJzdXBhYmFzZSJ9.2OFTnDKqV42NvGDOtc7oieh8wR6HTQIdYJjGH_KW8wU" >> .env.local; \
+      echo "NEXT_PUBLIC_SUPABASE_PROJECT_REF=bader" >> .env.local; \
+    fi
+
+# Override with build arguments if provided
+RUN if [ -n "$NEXT_PUBLIC_SUPABASE_URL" ]; then \
+      echo "NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL" > .env.local; \
+    fi
+RUN if [ -n "$NEXT_PUBLIC_SUPABASE_ANON_KEY" ]; then \
+      echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY" >> .env.local; \
+    fi
+RUN if [ -n "$NEXT_PUBLIC_SUPABASE_PROJECT_REF" ]; then \
+      echo "NEXT_PUBLIC_SUPABASE_PROJECT_REF=$NEXT_PUBLIC_SUPABASE_PROJECT_REF" >> .env.local; \
+    fi
 
 # Show what's in .env.local (sanitized)
-RUN echo ".env.local created with values:"
+RUN echo ".env.local contents:"
 RUN cat .env.local | sed 's/=.*/=***/'
 
 # Set environment variables
