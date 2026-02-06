@@ -52,7 +52,11 @@ export interface Job {
   client_phone: string;
   client_address?: string;
   status: string;
-  photos?: string[];
+  photos?: {
+    before?: string[];
+    during?: string[];
+    after?: string[];
+  };
   notes?: string;
   voice_notes?: string[];
   measurements?: Json;

@@ -331,10 +331,14 @@ export default function JobsPage() {
                       </div>
                     </div>
 
-                    {job.photos && (job.photos.length || 0) > 0 && (
+                    {job.photos && (
                       <div className="flex items-center gap-2 text-sm text-green-600 mb-3">
                         <Camera size={16} />
-                        <span>{job.photos.length} صور</span>
+                        <span>
+                          {(job.photos.before?.length || 0) +
+                           (job.photos.during?.length || 0) +
+                           (job.photos.after?.length || 0)} صور
+                        </span>
                       </div>
                     )}
 
