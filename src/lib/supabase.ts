@@ -33,14 +33,17 @@ export interface Product {
   id: string;
   name_ar: string;
   name_en?: string;
+  description?: string;
   category: string;
   product_type?: string;
   price_usd: number;
+  dimensions?: string;
   specifications?: Json;
   images?: string[];
   stock?: number;
   supplier_name?: string;
   brand?: string;
+  unit?: string;
   created_at: string;
   updated_at: string;
 }
