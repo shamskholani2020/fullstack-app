@@ -205,8 +205,8 @@ export default function ProductsPage() {
     }
   };
 
-  const getStockColor = (stock: number): string => {
-    if (stock <= 0) return 'bg-red-200 text-red-800';
+  const getStockColor = (stock?: number): string => {
+    if (stock === undefined || stock <= 0) return 'bg-red-200 text-red-800';
     if (stock < 10) return 'bg-yellow-200 text-yellow-800';
     return 'bg-green-200 text-green-800';
   };
@@ -368,10 +368,10 @@ export default function ProductsPage() {
                     {/* Category Badge */}
                     <div className="flex items-center justify-between mb-3">
                       <span className={`px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800`}>
-                        {categoryLabels[product.category].icon} {categoryLabels[product.category].ar}
+                        {categoryLabels[product.category as ProductCategory]?.icon} {categoryLabels[product.category as ProductCategory]?.ar}
                       </span>
                       <span className={`px-3 py-1 rounded-full text-xs font-bold ${getStockColor(product.stock)}`}>
-                        {product.stock} {product.unit.split(' ')[0]}
+                        {product.stock || 0} {product.unit?.split(' ')[0] || ''}
                       </span>
                     </div>
 
@@ -410,11 +410,11 @@ export default function ProductsPage() {
                           setFormData({
                             name: product.name_en || '',
                             nameAr: product.name_ar,
-                            category: product.category,
-                            priceUSD: product.price_usd,
-                            priceSYP: parseFloat(product.price_usd.toString()) * EXCHANGE_RATE,
-                            stock: product.stock,
-                            unit: product.unit,
+                            category: product.category as ProductCategory,
+                            priceUSD: product.price_usd || 0,
+                            priceSYP: parseFloat((product.price_usd || 0).toString()) * EXCHANGE_RATE,
+                            stock: product.stock || 0,
+                            unit: product.unit || 'قطعة (Piece)',
                             dimensions: product.dimensions || '',
                             description: product.description || '',
                             supplier: product.supplier_name || '',
