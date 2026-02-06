@@ -225,7 +225,8 @@ export default function ProductsPage() {
 
   // Category counts
   const categoryCounts = products.reduce((acc, product) => {
-    acc[product.category] = (acc[product.category] || 0) + 1;
+    const category = product.category as ProductCategory;
+    acc[category] = (acc[category] || 0) + 1;
     return acc;
   }, {} as Record<ProductCategory, number>);
 
